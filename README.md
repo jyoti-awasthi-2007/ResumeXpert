@@ -62,6 +62,7 @@ Assessment: 62%
 Confidence: Medium
 
 Status: Needs Validation
+````
 
 ### 8. Career Readiness
 
