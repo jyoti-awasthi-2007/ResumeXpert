@@ -84,7 +84,7 @@ export default function LoginPage() {
                                     <a href="#" className="text-primary hover:text-primary-light transition-colors">Forgot password?</a>
                                 </div>
 
-                                <AnimatedButton type="submit" variant="primary" size="lg" className="w-full">
+                                <AnimatedButton type="submit" variant="secondary" size="lg" className="w-full">
                                     Sign In
                                 </AnimatedButton>
                             </form>

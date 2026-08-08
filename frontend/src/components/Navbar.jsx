@@ -82,7 +82,7 @@ export default function Navbar() {
                             <AnimatedButton variant="ghost" size="sm" className="w-full">Log in</AnimatedButton>
                         </Link>
                         <Link to="/signup" onClick={() => setOpen(false)}>
-                            <AnimatedButton variant="primary" size="sm" className="w-full">Get Started</AnimatedButton>
+                            <AnimatedButton variant="outline" size="sm" className="w-full">Get Started</AnimatedButton>
                         </Link>
                     </motion.div>
                 )}

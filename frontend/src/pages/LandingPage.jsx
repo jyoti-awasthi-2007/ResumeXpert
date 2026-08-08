@@ -68,7 +68,7 @@ export default function LandingPage() {
                             className="flex flex-col sm:flex-row items-center justify-center gap-4"
                         >
                             <Link to="/signup">
-                                <AnimatedButton variant="primary" size="lg" icon={ArrowRight}>
+                                <AnimatedButton variant="secondary" size="lg" icon={ArrowRight}>
                                     Get Started Free
                                 </AnimatedButton>
                             </Link>
@@ -237,7 +237,7 @@ export default function LandingPage() {
                             <h2 className="text-3xl sm:text-4xl font-bold text-white mb-4">Ready to Verify Smarter?</h2>
                             <p className="text-white/50 mb-8 max-w-lg mx-auto">Join thousands of recruiters and candidates using VerifyAI to build trusted credentials.</p>
                             <Link to="/signup">
-                                <AnimatedButton variant="primary" size="lg" icon={ArrowRight}>
+                                <AnimatedButton variant="secondary" size="lg" icon={ArrowRight}>
                                     Start Free Today
                                 </AnimatedButton>
                             </Link>

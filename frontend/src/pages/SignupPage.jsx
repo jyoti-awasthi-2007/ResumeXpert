@@ -110,7 +110,7 @@ export default function SignupPage() {
                                     )}
                                 </div>
 
-                                <AnimatedButton type="submit" variant="primary" size="lg" className="w-full">
+                                <AnimatedButton type="submit" variant="secondary" size="lg" className="w-full">
                                     Create Account
                                 </AnimatedButton>
                             </form>

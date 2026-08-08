@@ -1,5 +1,5 @@
 import { motion } from 'framer-motion'
-import { TrendingUp, FileText, Award, ShieldCheck, Brain, Upload, ArrowRight } from 'lucide-react'
+import { TrendingUp, FileText, Award, ShieldCheck, Brain, Upload, ArrowRight, Compass, ArrowDownRight } from 'lucide-react'
 import { AreaChart, Area, XAxis, YAxis, CartesianGrid, Tooltip, ResponsiveContainer } from 'recharts'
 import { Link } from 'react-router-dom'
 import DashboardLayout from '../layouts/DashboardLayout'
@@ -119,8 +119,8 @@ export default function Dashboard() {
                         <div className="space-y-3">
                             {[
                                 { label: 'Upload Resume', icon: Upload, path: '/upload-resume', color: 'from-primary to-purple-400' },
-                                { label: 'Start AI Interview', icon: Brain, path: '/ai-interview', color: 'from-accent to-cyan-300' },
-                                { label: 'Take Skill Test', icon: Award, path: '/skill-test', color: 'from-green-500 to-emerald-400' },
+                                { label: 'Find Career Matches', icon: Compass, path: '/career-suggestions', color: 'from-accent to-cyan-300' },
+                                { label: 'Review Skill Gap', icon: ArrowDownRight, path: '/skill-gap', color: 'from-green-500 to-emerald-400' },
                             ].map((action, i) => (
                                 <Link key={action.path} to={action.path}>
                                     <motion.div
