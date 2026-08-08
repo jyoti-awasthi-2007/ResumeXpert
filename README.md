@@ -214,6 +214,3 @@ CareerLens AI transforms traditional resume analysis into an intelligent career 
 **Resume Analysis + NLP + Skill Extraction + Career Recommendation + Skill Gap Analysis + AI Assessment + Skill Confidence + Career Readiness**
 
 > **Don't just analyze the resume. Understand the candidate.**
-
-```
-```
