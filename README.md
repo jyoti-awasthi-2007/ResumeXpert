@@ -1,105 +1,218 @@
-# AI Resume System
 
-AI Resume System is an AI-powered resume, certificate verification, and talent assessment platform built with React and Vite. The UI offers an interactive dashboard for candidates and recruiters to upload resumes, validate certificates, complete AI interview sessions, track skills, and review analytics.
+## AI-Powered Resume, Skill Gap & Career Readiness System
 
-## Key Features
+> **Your resume tells us what you claim. Your assessment shows what you demonstrate.**
 
-- AI Resume Upload
-  - Upload resume files and simulate AI-driven skill extraction.
-  - Display scanned skills with a polished result experience.
-- Certificate Analysis
-  - Upload multiple certificates for authenticity checks.
-  - Show trust scores, risk levels, and verification status.
-- AI Interview Simulation
-  - Conduct a conversational AI interview with technical questions.
-  - Track progress and confidence scoring in a messaging interface.
-- Skill Test
-  - Access a skills assessment flow for technical screening.
-- Integrity Monitor
-  - Simulated integrity monitoring for assessment sessions.
-- Results & Analytics
-  - Visualize resume, certificate, and interview performance.
-  - Use trend charts, progress bars, and activity summaries.
-- Verified Profile
-  - Share a verified profile with skills and certificate badges.
-- Recruiter Dashboard
-  - Compare candidate trust signals and assessment status.
-- Modern UI
-  - Built with Tailwind CSS, Framer Motion, and animated UI components.
+CareerLens AI is an AI-powered career intelligence platform that analyzes resumes using NLP, extracts skills, recommends suitable career paths, identifies skill gaps, recommends missing skills, and evaluates actual technical knowledge through AI-generated assessments.
 
-## Pages & Routes
+---
 
-- `/` — Landing page with product overview and feature highlights.
-- `/login` — Login page.
-- `/signup` — Signup page.
-- `/dashboard` — Main dashboard with trust score and activity feed.
-- `/upload-resume` — Resume upload and skill extraction workflow.
-- `/certificate-analysis` — Certificate verification and risk analysis.
-- `/ai-interview` — AI interview experience with chat UI.
-- `/skill-test` — Skill testing interface.
-- `/integrity-monitor` — Integrity monitoring page.
-- `/results` — Results and analytics summary.
-- `/profile` — Verified profile page.
-- `/recruiter` — Recruiter dashboard.
+## Features
+
+### 1. AI Resume Analysis
+- Upload PDF/DOCX resume
+- NLP-based resume processing
+- Extract education, experience, projects and skills
+- Resume quality score
+- Strengths and weaknesses analysis
+
+### 2. Skill Extraction
+- Automatically extract technical skills
+- Categorize skills
+- Skill confidence scores
+- Identify strong and weak skills
+
+### 3. Career Suggestions
+- Recommend suitable career paths
+- Career match percentage
+- Show matched skills
+- Show missing skills
+- Select target career
+
+### 4. Skill Gap Analysis
+- Compare current skills with career requirements
+- Identify missing skills
+- Prioritize skill gaps
+- Recommend skills to learn
+- Provide learning order
+
+### 5. AI Career Skill Assessment
+- Career-specific MCQ test
+- AI-generated questions
+- Beginner level
+- Advanced level
+- Expert level
+- Skill-wise assessment
+
+### 6. Skill Confidence
+- Overall confidence score
+- Skill-wise confidence
+- Low / Developing / Good / High / Expert levels
+
+### 7. Resume Claim vs Actual Skill
+Compare what the candidate claims on their resume with what they demonstrate in the assessment.
+
+Example:
+
+```text
+Machine Learning
+
+Resume Claim: Advanced
+Assessment: 62%
+Confidence: Medium
+
+Status: Needs Validation
+
+### 8. Career Readiness
+
+Generate an overall career readiness score using:
+
+* Resume quality
+* Skill match
+* Assessment performance
+* Skill confidence
+
+Example:
+
+```text
+Career Readiness: 81%
+
+Status: Good Preparation
+```
+
+### 9. Analytics
+
+* Resume analytics
+* Skill analytics
+* Career match analytics
+* Skill gap analytics
+* Assessment analytics
+* Confidence analytics
+* Career readiness analytics
+
+---
+
+## System Workflow
+
+```text
+Upload Resume
+      ↓
+NLP Processing
+      ↓
+Resume Analysis
+      ↓
+Skill Extraction
+      ↓
+Career Suggestions
+      ↓
+Select Target Career
+      ↓
+Skill Gap Analysis
+      ↓
+Missing Skills
+      ↓
+Skill Recommendations
+      ↓
+AI Skill Assessment
+      ↓
+Beginner / Advanced / Expert
+      ↓
+Assessment Results
+      ↓
+Skill Confidence
+      ↓
+Resume Claim vs Actual Skill
+      ↓
+Career Readiness
+      ↓
+Personalized Next Steps
+```
+
+---
 
 ## Technology Stack
 
-- React 19
-- Vite
-- Tailwind CSS
-- Framer Motion
-- React Router DOM
-- Recharts
-- Lucide React icons
-- Axios
-- ESLint
+### Frontend
 
-## Installation
+* React
+* Vite
+* Tailwind CSS
+* React Router
+* Recharts
+* Lucide Icons
 
-1. Install dependencies:
+### Backend
 
-   ```bash
-   npm install
-   ```
+* Python
+* FastAPI
 
-2. Start the development server:
+### AI / NLP
 
-   ```bash
-   npm run dev
-   ```
+* NLP
+* Machine Learning
+* Semantic Similarity
+* Skill Extraction
+* AI Question Generation
 
-3. Build for production:
+### Database
 
-   ```bash
-   npm run build
-   ```
+* MongoDB / PostgreSQL
 
-4. Preview the production build:
+---
 
-   ```bash
-   npm run preview
-   ```
+## Main Modules
 
-## Project Structure
+```text
+Dashboard
+Resume Analysis
+Skills
+Career Suggestions
+Skill Gap
+Skill Recommendations
+Skill Assessment
+Assessment Results
+Skill Confidence
+Claim vs Actual Skill
+Career Readiness
+Analytics
+```
 
-- `src/App.jsx` — Main router setup and page definitions.
-- `src/pages/` — Application page components for core product flows.
-- `src/components/` — Reusable UI components such as upload box, cards, and badge.
-- `src/layouts/DashboardLayout.jsx` — Shared dashboard layout wrapper.
-- `src/index.css` — Global styles and Tailwind configuration entry.
-- `vite.config.js` — Vite configuration.
-- `package.json` — Project dependencies and scripts.
+---
 
-## Notes
+## Unique Feature
 
-- The current app is a front-end prototype.
-- AI features and verification workflows are simulated for demo purposes.
-- Most data is mocked inside the UI and does not connect to a live backend.
+The main differentiator of CareerLens AI is:
 
-## Contribution
+```text
+Resume Claims
+      VS
+Demonstrated Skills
+```
 
-Contributions are welcome. Open an issue or submit a pull request for new features, bug fixes, or UI improvements.
+Instead of only analyzing what candidates write on their resumes, CareerLens AI evaluates whether their claimed skills are supported by their assessment performance.
 
-## License
+---
 
-This repository does not specify a license. Add one if you plan to publish or share the project publicly.
+## Project Objective
+
+The main objective is to help students and job seekers understand:
+
+* What skills they currently have
+* Which careers suit them
+* What skills they are missing
+* What they should learn
+* How well they actually understand their claimed skills
+* How ready they are for their target career
+
+---
+
+## Conclusion
+
+CareerLens AI transforms traditional resume analysis into an intelligent career guidance system by combining:
+
+**Resume Analysis + NLP + Skill Extraction + Career Recommendation + Skill Gap Analysis + AI Assessment + Skill Confidence + Career Readiness**
+
+> **Don't just analyze the resume. Understand the candidate.**
+
+```
+```
