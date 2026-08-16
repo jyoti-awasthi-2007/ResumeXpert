@@ -19,10 +19,12 @@ export default function AnimatedButton({
     }
 
     const variantClasses = {
-        primary: 'bg-primary text-white shadow-sm hover:bg-slate-900',
-        secondary: 'bg-white text-primary border border-surface shadow-sm hover:bg-surface-secondary',
-        outline: 'bg-transparent text-primary border border-surface hover:bg-surface-secondary',
-        ghost: 'bg-transparent text-primary hover:bg-surface-secondary',
+        primary: 'btn-primary',
+        secondary: 'btn-secondary',
+        outline: 'btn-secondary',
+        ghost: 'btn-secondary',
+        ai: 'btn-ai',
+        premium: 'btn-premium',
         danger: 'bg-red-600 text-white hover:bg-red-700',
     }
 

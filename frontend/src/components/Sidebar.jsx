@@ -103,7 +103,7 @@ export default function Sidebar({ open, onClose }) {
                 <div className={`flex items-center ${collapsed ? 'justify-center' : 'justify-between'} p-5 border-b border-surface`}>
                     {!collapsed && (
                         <div className="flex items-center gap-3">
-                            <div className="w-10 h-10 rounded-2xl bg-surface-secondary flex items-center justify-center text-primary shadow-sm">
+                            <div className="w-10 h-10 rounded-2xl bg-primary flex items-center justify-center text-white shadow-sm">
                                 <Shield size={18} />
                             </div>
                             <div>
@@ -133,19 +133,22 @@ export default function Sidebar({ open, onClose }) {
                         <div key={section.label} className="space-y-3">
                             {!collapsed && <p className="px-3 text-xs font-semibold uppercase tracking-[0.25em] text-secondary">{section.label}</p>}
                             <div className="space-y-1">
-                                {section.items.map((item, index) => (
-                                    <NavLink
-                                        key={item.path}
-                                        to={item.path}
-                                        onClick={onClose}
-                                        className={({ isActive }) =>
-                                            `flex items-center gap-3 px-3 py-3 rounded-2xl transition-colors duration-200 ${isActive ? 'bg-surface-secondary text-primary shadow-sm' : 'text-secondary hover:bg-surface-secondary hover:text-primary'}`
-                                        }
-                                    >
-                                        <item.icon size={18} />
-                                        {!collapsed && <span className="text-sm font-medium">{item.name}</span>}
-                                    </NavLink>
-                                ))}
+                                    {section.items.map((item, index) => (
+                                        <NavLink
+                                            key={item.path}
+                                            to={item.path}
+                                            onClick={onClose}
+                                        >
+                                            {({ isActive }) => (
+                                                <div className={`flex items-center gap-3 px-3 py-3 rounded-2xl transition-colors duration-200 ${isActive ? 'bg-surface-secondary text-primary shadow-sm' : 'text-secondary hover:bg-surface-secondary hover:text-primary'}`}>
+                                                    <div className="w-9 h-9 rounded-lg flex items-center justify-center" style={{ background: isActive ? 'linear-gradient(90deg,var(--grad-1),var(--grad-2))' : 'var(--color-surface-secondary)' }}>
+                                                        <item.icon size={16} className={isActive ? 'text-white' : 'text-primary'} />
+                                                    </div>
+                                                    {!collapsed && <span className="text-sm font-medium">{item.name}</span>}
+                                                </div>
+                                            )}
+                                        </NavLink>
+                                    ))}
                             </div>
                         </div>
                     ))}

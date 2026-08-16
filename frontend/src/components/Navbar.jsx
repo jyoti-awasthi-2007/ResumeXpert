@@ -24,8 +24,8 @@ export default function Navbar() {
         >
             <div className="mx-auto max-w-7xl px-4 sm:px-6 lg:px-8">
                 <div className="glass-card mt-4 px-6 py-3 flex items-center justify-between">
-                    <Link to="/" className="flex items-center gap-2 group">
-                        <div className="w-9 h-9 rounded-xl bg-linear-to-br from-primary to-accent flex items-center justify-center group-hover:shadow-[0_0_20px_rgba(108,92,231,0.5)] transition-shadow">
+                    <Link to="/" className="flex items-center gap-3 group">
+                        <div className="w-10 h-10 rounded-lg sig-gradient flex items-center justify-center group-hover:shadow-[0_8px_30px_rgba(49,87,232,0.12)] transition-shadow">
                             <Shield size={20} className="text-white" />
                         </div>
                         <span className="text-xl font-bold gradient-text">VerifyAI</span>
@@ -37,7 +37,7 @@ export default function Navbar() {
                                 <a
                                     key={link.name}
                                     href={link.href}
-                                    className="text-white/60 hover:text-white transition-colors text-sm font-medium"
+                                    className="text-secondary hover:text-primary transition-colors text-sm font-medium"
                                 >
                                     {link.name}
                                 </a>
@@ -56,7 +56,7 @@ export default function Navbar() {
 
                     <button
                         onClick={() => setOpen(!open)}
-                        className="md:hidden text-white/70 hover:text-white"
+                        className="md:hidden text-secondary hover:text-primary"
                     >
                         {open ? <X size={24} /> : <Menu size={24} />}
                     </button>
@@ -72,7 +72,7 @@ export default function Navbar() {
                             <a
                                 key={link.name}
                                 href={link.href}
-                                className="text-white/60 hover:text-white transition-colors text-sm py-2"
+                                className="text-secondary hover:text-primary transition-colors text-sm py-2"
                                 onClick={() => setOpen(false)}
                             >
                                 {link.name}

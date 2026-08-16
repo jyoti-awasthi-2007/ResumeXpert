@@ -7,12 +7,12 @@ export default function ProgressRing({ value = 0, label = '', size = 180, stroke
   const offset = circumference - (progress / 100) * circumference
 
   const gradient = {
-    primary: ['#6C5CE7', '#7C3AED'],
-    accent: ['#00D4FF', '#34D399'],
-    success: ['#22C55E', '#4ADE80'],
-    warning: ['#FACC15', '#FB923C'],
+    primary: ['var(--grad-1)', 'var(--grad-2)'],
+    accent: ['var(--grad-2)', 'var(--grad-1)'],
+    success: ['var(--color-success)', 'var(--grad-2)'],
+    warning: ['var(--grad-3)', 'var(--grad-1)'],
     danger: ['#F43F5E', '#FB7185'],
-  }[color] || ['#6C5CE7', '#00D4FF']
+  }[color] || ['var(--grad-1)', 'var(--grad-2)']
 
   return (
     <div className="relative inline-flex items-center justify-center">
@@ -47,8 +47,8 @@ export default function ProgressRing({ value = 0, label = '', size = 180, stroke
         </defs>
       </svg>
       <div className="absolute inset-0 flex flex-col items-center justify-center">
-        <span className="text-3xl font-bold text-white">{progress}</span>
-        <span className="text-sm text-white/50">{label}</span>
+        <span className="text-3xl font-bold text-primary">{progress}</span>
+        <span className="text-sm text-secondary">{label}</span>
       </div>
     </div>
   )

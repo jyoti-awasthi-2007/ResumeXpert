@@ -23,12 +23,12 @@ export default function ScoreCard({ title, value, suffix = '', icon: Icon, color
         return () => clearTimeout(timer)
     }, [numericValue, delay])
 
-    const accentClasses = {
-        primary: 'text-primary',
-        accent: 'text-secondary',
-        success: 'text-green-600',
-        warning: 'text-amber-600',
-        danger: 'text-red-600',
+    const colorMap = {
+        primary: 'var(--color-primary)',
+        accent: 'var(--color-text-secondary)',
+        success: 'var(--color-success)',
+        warning: 'var(--color-warning)',
+        danger: 'var(--color-danger)',
     }
 
     return (
@@ -44,8 +44,8 @@ export default function ScoreCard({ title, value, suffix = '', icon: Icon, color
                     <h3 className="text-3xl font-semibold text-primary">{count}{suffix}</h3>
                 </div>
                 {Icon && (
-                    <div className="w-12 h-12 rounded-2xl bg-surface-secondary flex items-center justify-center text-primary">
-                        <Icon size={24} className={accentClasses[color]} />
+                    <div className="w-12 h-12 rounded-2xl bg-surface-secondary flex items-center justify-center" style={{ color: 'var(--color-primary)' }}>
+                        <Icon size={24} style={{ color: colorMap[color] }} />
                     </div>
                 )}
             </div>
@@ -54,7 +54,8 @@ export default function ScoreCard({ title, value, suffix = '', icon: Icon, color
                     initial={{ width: 0 }}
                     animate={{ width: `${Math.min((numericValue / 100) * 100, 100)}%` }}
                     transition={{ duration: 1.2, delay: delay + 0.2, ease: 'easeOut' }}
-                    className={`h-full rounded-full ${accentClasses[color]}`}
+                    className={`h-full rounded-full`}
+                    style={{ background: colorMap[color] }}
                 />
             </div>
         </motion.div>

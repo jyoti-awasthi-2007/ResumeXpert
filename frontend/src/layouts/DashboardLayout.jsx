@@ -7,15 +7,15 @@ export default function DashboardLayout({ children, title }) {
     const [sidebarOpen, setSidebarOpen] = useState(false)
 
     return (
-        <div className="min-h-screen bg-background">
+        <div className="min-h-screen" style={{ background: 'var(--color-surface-secondary)' }}>
             <Sidebar open={sidebarOpen} onClose={() => setSidebarOpen(false)} />
 
             <div className="lg:ml-[280px] transition-all duration-300">
                 <motion.header
                     initial={{ y: -20, opacity: 0 }}
                     animate={{ y: 0, opacity: 1 }}
-                    className="sticky top-0 z-30 bg-surface border-b border-surface px-4 sm:px-6 lg:px-8 py-4 flex items-center justify-between gap-3"
-                    style={{ borderRadius: 0 }}
+                    className="sticky top-0 z-30 bg-surface px-4 sm:px-6 lg:px-8 py-4 flex items-center justify-between gap-3"
+                    style={{ borderRadius: 0, boxShadow: '0 6px 18px rgba(23,32,51,0.04)' }}
                 >
                     <div className="flex items-center gap-3">
                         <button

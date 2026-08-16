@@ -18,9 +18,9 @@ export default function GradientBackground({ variant = 'default', children }) {
         window.addEventListener('resize', resize)
 
         const colors = {
-            default: ['#F5F5F7', '#FFFFFF', '#F7F7F8'],
-            auth: ['#F5F5F7', '#FFFFFF', '#F9F9F9'],
-            dashboard: ['#F5F5F7', '#FFFFFF', '#F8F8F9'],
+            default: ['#FFFFFF', '#F3F8FF', '#FFFFFF'],
+            auth: ['#FFFFFF', '#F3F8FF', '#FFFFFF'],
+            dashboard: ['#FFFFFF', '#F3F8FF', '#FFFFFF'],
         }
 
         const palette = colors[variant] || colors.default
@@ -35,7 +35,9 @@ export default function GradientBackground({ variant = 'default', children }) {
                 const radius = Math.min(canvas.width, canvas.height) * (0.3 + 0.05 * Math.sin(time * 0.5 + i))
 
                 const gradient = ctx.createRadialGradient(x, y, 0, x, y, radius)
-                gradient.addColorStop(0, palette[i % palette.length] + '80')
+                // use softer accent hues for subtle tech feel
+                const base = palette[i % palette.length]
+                gradient.addColorStop(0, base + '80')
                 gradient.addColorStop(1, 'transparent')
                 ctx.fillStyle = gradient
                 ctx.fillRect(0, 0, canvas.width, canvas.height)

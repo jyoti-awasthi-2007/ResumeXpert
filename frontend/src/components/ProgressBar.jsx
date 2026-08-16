@@ -3,12 +3,12 @@ import { motion } from 'framer-motion'
 export default function ProgressBar({ value = 0, max = 100, label = '', color = 'primary', showValue = true, delay = 0, height = 'h-2' }) {
     const percentage = Math.min((value / max) * 100, 100)
 
-    const colorClasses = {
-        primary: 'bg-primary',
-        accent: 'bg-secondary',
-        success: 'bg-green-500',
-        warning: 'bg-amber-500',
-        danger: 'bg-red-500',
+    const colorMap = {
+        primary: 'var(--color-primary)',
+        accent: 'var(--grad-2)',
+        success: 'var(--color-success)',
+        warning: 'var(--color-warning)',
+        danger: 'var(--color-danger)'
     }
 
     return (
@@ -24,7 +24,8 @@ export default function ProgressBar({ value = 0, max = 100, label = '', color = 
                     initial={{ width: 0 }}
                     animate={{ width: `${percentage}%` }}
                     transition={{ duration: 1.2, delay, ease: 'easeOut' }}
-                    className={`h-full rounded-full ${colorClasses[color]}`}
+                    className={`h-full rounded-full`}
+                    style={{ background: colorMap[color] }}
                 />
             </div>
         </div>
