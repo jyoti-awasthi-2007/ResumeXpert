@@ -29,6 +29,15 @@ SKILL_ALIASES = {
     "golang": "Go",
     "rust": "Rust",
     "php": "PHP",
+    "html": "HTML",
+    "css": "CSS",
+    "jquery": "jQuery",
+    "bootstrap": "Bootstrap",
+    "tailwind": "Tailwind CSS",
+    "tailwind css": "Tailwind CSS",
+    "c/c++": "C++",
+    "data structures": "Data Structures",
+    "figma": "Figma",
     
     # Web Frameworks
     "react": "React",
@@ -118,6 +127,13 @@ SKILL_CATEGORIES = {
     "Go": "Programming Languages",
     "Rust": "Programming Languages",
     "PHP": "Programming Languages",
+    "HTML": "Web Technologies",
+    "CSS": "Web Technologies",
+    "jQuery": "Web Frameworks",
+    "Bootstrap": "Web Frameworks",
+    "Tailwind CSS": "Web Frameworks",
+    "Data Structures": "Computer Science",
+    "Figma": "Tools & Design",
     
     "React": "Web Frameworks",
     "Vue": "Web Frameworks",
@@ -200,9 +216,9 @@ def extract_skills_from_text(text: str) -> list[tuple[str, str]]:
     
     # Search for each skill alias in the text
     for alias, normalized_name in sorted_aliases:
-        # Use \b word boundaries — works correctly across newlines and punctuation
+        # Use non-word boundaries so names containing symbols (for example C/C++) match.
         escaped = re.escape(alias)
-        pattern = r"(?i)\b" + escaped + r"\b"
+        pattern = r"(?i)(?<!\w)" + escaped + r"(?!\w)"
         if re.search(pattern, text_lower):
             if normalized_name not in found_skill_names:
                 category = get_skill_category(normalized_name)
