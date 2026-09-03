@@ -1,27 +1,9 @@
-import { assessmentLevels, assessmentQuestions } from '../data/mockData'
+import api from './api'
 
-export function getAssessmentLevels() {
-  return new Promise((resolve) => {
-    setTimeout(() => resolve(assessmentLevels), 400)
-  })
+export async function generateAssessment(resumeId, careerId, difficulty) {
+  return (await api.post('/assessments/generate', { resume_id: resumeId, career_id: careerId, difficulty })).data
 }
 
-export function generateAssessment(level) {
-  return new Promise((resolve, reject) => {
-    setTimeout(() => {
-      const questions = assessmentQuestions[level]
-      if (questions) resolve(questions)
-      else reject(new Error('Assessment level not found'))
-    }, 500)
-  })
-}
-
-export function submitAssessment(answers) {
-  return new Promise((resolve) => {
-    setTimeout(() => {
-      const correct = answers.filter((item) => item.isCorrect).length
-      const score = Math.round((correct / answers.length) * 100)
-      resolve({ score, correct, incorrect: answers.length - correct, total: answers.length })
-    }, 700)
-  })
+export async function submitAssessment(assessmentId, answers) {
+  return (await api.post(`/assessments/${assessmentId}/submit`, { answers })).data
 }

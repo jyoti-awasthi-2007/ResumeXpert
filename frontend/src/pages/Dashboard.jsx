@@ -1,35 +1,37 @@
 import { motion } from 'framer-motion'
-import { TrendingUp, FileText, Award, ShieldCheck, Brain, Upload, ArrowRight, Compass, ArrowDownRight } from 'lucide-react'
+import { TrendingUp, FileText, Award, Brain, Upload, ArrowRight, Compass, ArrowDownRight } from 'lucide-react'
 import { AreaChart, Area, XAxis, YAxis, CartesianGrid, Tooltip, ResponsiveContainer } from 'recharts'
 import { Link } from 'react-router-dom'
 import DashboardLayout from '../layouts/DashboardLayout'
 import ScoreCard from '../components/ScoreCard'
 import ProgressBar from '../components/ProgressBar'
 import PageTransition from '../components/PageTransition'
-
-const chartData = [
-    { name: 'Jan', score: 65 }, { name: 'Feb', score: 72 }, { name: 'Mar', score: 68 },
-    { name: 'Apr', score: 78 }, { name: 'May', score: 82 }, { name: 'Jun', score: 87 },
-    { name: 'Jul', score: 91 },
-]
+import { useCareerLens } from '../context/CareerLensContext'
 
 const recentActivities = [
     { action: 'Resume analyzed', detail: 'react_developer_resume.pdf', time: '2 min ago', icon: FileText },
-    { action: 'Certificate verified', detail: 'AWS Solutions Architect', time: '15 min ago', icon: Award },
-    { action: 'AI Interview completed', detail: 'React & Node.js assessment', time: '1 hour ago', icon: Brain },
-    { action: 'Skill test passed', detail: 'JavaScript Advanced — 94%', time: '3 hours ago', icon: ShieldCheck },
+    { action: 'Assessment completed', detail: 'Career skill assessment', time: '1 hour ago', icon: Brain },
+    { action: 'Career readiness updated', detail: 'Review your next steps', time: '3 hours ago', icon: Award },
 ]
 
 export default function Dashboard() {
+    const { analyticsOverview } = useCareerLens()
+    const metrics = analyticsOverview.main || {}
+    const chartData = [
+        { name: 'Resume', score: metrics.resume_score || 0 },
+        { name: 'Match', score: metrics.career_match || 0 },
+        { name: 'Assessment', score: metrics.assessment_score || 0 },
+        { name: 'Readiness', score: metrics.career_readiness || 0 },
+    ]
     return (
         <PageTransition>
             <DashboardLayout title="Dashboard">
                 {/* Stat Cards */}
                 <div className="grid sm:grid-cols-2 lg:grid-cols-4 gap-6 mb-8">
-                    <ScoreCard title="Skill Trust Score" value={87} suffix="%" icon={TrendingUp} color="primary" delay={0} />
-                    <ScoreCard title="Certificates Uploaded" value={12} icon={FileText} color="accent" delay={0.1} />
-                    <ScoreCard title="Tests Completed" value={8} icon={Award} color="success" delay={0.2} />
-                    <ScoreCard title="Verification Status" value={94} suffix="%" icon={ShieldCheck} color="warning" delay={0.3} />
+                    <ScoreCard title="Career Readiness" value={metrics.career_readiness || 0} suffix="%" icon={TrendingUp} color="primary" delay={0} />
+                    <ScoreCard title="Resume Score" value={metrics.resume_score || 0} suffix="%" icon={FileText} color="accent" delay={0.1} />
+                    <ScoreCard title="Assessment Score" value={metrics.assessment_score || 0} suffix="%" icon={Award} color="success" delay={0.2} />
+                    <ScoreCard title="Skill Confidence" value={metrics.confidence_score || 0} suffix="%" icon={Brain} color="warning" delay={0.3} />
                 </div>
 
                 <div className="grid lg:grid-cols-3 gap-6 mb-8">
@@ -69,11 +71,10 @@ export default function Dashboard() {
                     >
                         <h3 className="text-lg font-semibold text-primary mb-5">Top Skills</h3>
                         <div className="space-y-4">
-                            <ProgressBar label="React.js" value={92} color="primary" delay={0.6} />
-                            <ProgressBar label="Node.js" value={85} color="accent" delay={0.7} />
-                            <ProgressBar label="Python" value={78} color="success" delay={0.8} />
-                            <ProgressBar label="AWS" value={70} color="warning" delay={0.9} />
-                            <ProgressBar label="TypeScript" value={88} color="primary" delay={1.0} />
+                            <ProgressBar label="Skills detected" value={metrics.skills_detected || 0} color="primary" delay={0.6} />
+                            <ProgressBar label="Career match" value={metrics.career_match || 0} color="accent" delay={0.7} />
+                            <ProgressBar label="Skill gap" value={metrics.skill_gap_count || 0} color="warning" delay={0.8} />
+                            <ProgressBar label="Assessment" value={metrics.assessment_score || 0} color="success" delay={0.9} />
                         </div>
                     </motion.div>
                 </div>

@@ -17,10 +17,10 @@ const radarData = [
 
 const barData = [
     { name: 'Resume', score: 90 },
-    { name: 'Certificates', score: 85 },
-    { name: 'Interview', score: 78 },
+    { name: 'Skill Match', score: 85 },
+    { name: 'Assessment', score: 78 },
     { name: 'Skill Test', score: 92 },
-    { name: 'Integrity', score: 95 },
+    { name: 'Readiness', score: 95 },
 ]
 
 export default function ResultsAnalytics() {
@@ -90,7 +90,7 @@ export default function ResultsAnalytics() {
                             <h3 className="text-sm text-white/50 font-medium">Performance Summary</h3>
                             {[
                                 { label: 'Resume Score', value: 90, color: 'primary', icon: Target },
-                                { label: 'Interview Score', value: 78, color: 'accent', icon: Zap },
+                                { label: 'Assessment Score', value: 78, color: 'accent', icon: Zap },
                                 { label: 'Test Score', value: 92, color: 'success', icon: Award },
                             ].map((item, i) => (
                                 <div key={item.label}>

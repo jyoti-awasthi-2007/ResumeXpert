@@ -21,9 +21,11 @@ export default function AssessmentLevel() {
   const levelMeta = useMemo(() => assessmentLevels.find((item) => item.id === level), [assessmentLevels, level])
 
   useEffect(() => {
-    const data = generateAssessmentQuestions(level)
-    setQuestions(data)
-    setLoading(false)
+    let active = true
+    generateAssessmentQuestions(level).then((data) => {
+      if (active) { setQuestions(data.questions || data); setLoading(false) }
+    }).catch(() => { if (active) setLoading(false) })
+    return () => { active = false }
   }, [generateAssessmentQuestions, level])
 
   useEffect(() => {
@@ -47,12 +49,10 @@ export default function AssessmentLevel() {
       setCurrent((prev) => prev + 1)
     } else {
       const answers = questions.map((question, index) => ({
-        questionId: question.id,
-        isCorrect: selectedAnswers[index]?.answer === question.correct,
+        question_id: question.id,
+        answer: selectedAnswers[index]?.answer,
       }))
-      const resultData = submitAssessment(answers)
-      setResult(resultData)
-      setFinished(true)
+      submitAssessment(answers).then((resultData) => { setResult(resultData); setFinished(true) })
     }
   }
 

@@ -22,17 +22,17 @@ export default function CareerCard({ career, onView }) {
       <div className="space-y-2 mb-5">
         <p className="text-sm text-white/60">Matched Skills</p>
         <div className="flex flex-wrap gap-2">
-          {career.matchedSkills.slice(0, 3).map((skill) => (
+          {(career.matchedSkills ?? career.matched_skills ?? []).slice(0, 3).map((skill) => (
             <span key={skill} className="px-3 py-1 rounded-full bg-white/5 text-xs text-white/70">{skill}</span>
           ))}
-          {career.matchedSkills.length > 3 && (
-            <span className="px-3 py-1 rounded-full bg-white/5 text-xs text-white/50">+{career.matchedSkills.length - 3}</span>
+          {((career.matchedSkills ?? career.matched_skills ?? []).length > 3) && (
+            <span className="px-3 py-1 rounded-full bg-white/5 text-xs text-white/50">+{(career.matchedSkills ?? career.matched_skills ?? []).length - 3}</span>
           )}
         </div>
       </div>
 
       <div className="flex items-center justify-between text-sm text-white/50">
-        <span>{career.missingSkills.length} Missing</span>
+        <span>{(career.missingSkills ?? career.missing_skills ?? []).length} Missing</span>
         <ChevronRight size={18} className="text-white/40" />
       </div>
     </motion.div>

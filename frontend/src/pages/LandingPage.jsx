@@ -40,7 +40,7 @@ export default function LandingPage() {
                                     Verify the right talent with <span className="sig-gradient text-transparent gradient-text">AI-powered insights</span>
                                 </h1>
 
-                                <p className="text-lg text-secondary max-w-2xl mb-8">Analyze resumes, verify certificates, run AI interviews, and surface top candidates with confidence — faster and smarter.</p>
+                                <p className="text-lg text-secondary max-w-2xl mb-8">Analyze your resume, discover career paths, close skill gaps, and measure the knowledge behind your claims.</p>
 
                                 <div className="flex flex-col sm:flex-row gap-4 items-start sm:items-center">
                                     <Link to="/signup">
@@ -69,7 +69,7 @@ export default function LandingPage() {
                                             <Shield size={20} className="text-white" />
                                         </div>
                                     </div>
-                                    <p className="text-sm text-secondary">Certificates Verified • 2,847</p>
+                                    <p className="text-sm text-secondary">Career paths analyzed • 2,847</p>
                                 </div>
 
                                 <div className="mt-6 grid grid-cols-2 gap-4">
@@ -96,9 +96,9 @@ export default function LandingPage() {
                         </motion.div>
                         <div className="grid md:grid-cols-3 gap-6">
                             {[
-                                { icon: FileCheck, title: 'Fake Certificates', desc: '68% of recruiters have caught candidates with falsified credentials.' },
+                                { icon: FileCheck, title: 'Unclear Resumes', desc: 'Important skills and outcomes are often difficult to identify quickly.' },
                                 { icon: Users, title: 'Slow Verification', desc: 'Manual verification takes 5-10 business days, delaying hiring decisions.' },
-                                { icon: Lock, title: 'No Skill Proof', desc: 'Certificates prove attendance, not competence. Skills remain unverified.' },
+                                { icon: Lock, title: 'No Skill Proof', desc: 'A resume claim is more useful when backed by demonstrated knowledge.' },
                             ].map((item, i) => (
                                 <motion.div
                                     key={item.title}
@@ -125,13 +125,13 @@ export default function LandingPage() {
                     <div className="max-w-6xl mx-auto">
                         <motion.div {...fadeUp} className="text-center mb-16">
                             <h2 className="text-3xl sm:text-4xl font-bold text-white mb-4">How It Works</h2>
-                            <p className="text-white/50 max-w-xl mx-auto">Three simple steps to verified, trusted credentials.</p>
+                            <p className="text-white/50 max-w-xl mx-auto">Three simple steps from resume to career readiness.</p>
                         </motion.div>
                         <div className="grid md:grid-cols-3 gap-8">
                             {[
-                                { step: '01', icon: Brain, title: 'Upload & Scan', desc: 'Upload resumes and certificates. Our AI extracts skills, validates documents, and detects anomalies.' },
-                                { step: '02', icon: Shield, title: 'AI Interview', desc: 'Candidates take an AI-powered interview that assesses real-world knowledge and flags inconsistencies.' },
-                                { step: '03', icon: Award, title: 'Trust Score', desc: 'Get a comprehensive Skill Trust Score combining certificate authenticity, interview performance, and skill tests.' },
+                                { step: '01', icon: Brain, title: 'Upload & Analyze', desc: 'Upload a resume and extract the skills, experience, and education that shape your profile.' },
+                                { step: '02', icon: Shield, title: 'Test Your Skills', desc: 'Take a career-specific assessment to measure demonstrated knowledge at your chosen level.' },
+                                { step: '03', icon: Award, title: 'Build Your Path', desc: 'See your gaps, confidence, readiness, and the next skills to learn.' },
                             ].map((item, i) => (
                                 <motion.div
                                     key={item.step}
@@ -170,11 +170,11 @@ export default function LandingPage() {
                         <div className="grid sm:grid-cols-2 lg:grid-cols-3 gap-6">
                             {[
                                 { icon: Brain, title: 'AI Resume Parsing', desc: 'Extract skills, experience, and education using NLP.' },
-                                { icon: FileCheck, title: 'Certificate Verification', desc: 'Detect forged or tampered certificates instantly.' },
-                                { icon: Shield, title: 'Integrity Monitoring', desc: 'Webcam + tab tracking ensures honest assessments.' },
+                                { icon: FileCheck, title: 'Resume Analysis', desc: 'Understand the quality and coverage of your resume.' },
+                                { icon: Shield, title: 'Skill Validation', desc: 'Compare resume claims with assessment performance.' },
                                 { icon: BarChart3, title: 'Rich Analytics', desc: 'Detailed dashboards with trust scores and risk metrics.' },
-                                { icon: Award, title: 'Verified Profiles', desc: 'Shareable verified profile badges for candidates.' },
-                                { icon: Users, title: 'Recruiter Dashboard', desc: 'Compare candidates by skill scores and fraud risk.' },
+                                { icon: Award, title: 'Career Readiness', desc: 'Combine resume quality, skill match, and demonstrated knowledge.' },
+                                { icon: Users, title: 'Personalized Guidance', desc: 'Get a practical learning order for your next skills.' },
                             ].map((feature, i) => (
                                 <motion.div
                                     key={feature.title}
@@ -212,7 +212,7 @@ export default function LandingPage() {
                         />
                         <div className="relative z-10">
                             <h2 className="text-3xl sm:text-4xl font-bold text-white mb-4">Ready to Verify Smarter?</h2>
-                            <p className="text-white/50 mb-8 max-w-lg mx-auto">Join thousands of recruiters and candidates using VerifyAI to build trusted credentials.</p>
+                            <p className="text-white/50 mb-8 max-w-lg mx-auto">Build a clearer path from what your resume claims to what you can demonstrate.</p>
                             <Link to="/signup">
                                 <AnimatedButton variant="secondary" size="lg" icon={ArrowRight}>
                                     Start Free Today

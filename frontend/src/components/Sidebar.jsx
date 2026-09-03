@@ -1,6 +1,5 @@
 import { NavLink, useNavigate } from 'react-router-dom'
 import { motion, AnimatePresence } from 'framer-motion'
-import { useState } from 'react'
 import {
     LayoutDashboard,
     FileText,
@@ -70,8 +69,7 @@ const sections = [
     },
 ]
 
-export default function Sidebar({ open, onClose }) {
-    const [collapsed, setCollapsed] = useState(false)
+export default function Sidebar({ open, onClose, collapsed, onToggleCollapse }) {
     const navigate = useNavigate()
 
     return (
@@ -120,7 +118,7 @@ export default function Sidebar({ open, onClose }) {
                             <X size={16} />
                         </button>
                         <button
-                            onClick={() => setCollapsed(!collapsed)}
+                            onClick={onToggleCollapse}
                             className="hidden lg:flex w-9 h-9 rounded-xl bg-surface-secondary flex items-center justify-center text-secondary hover:text-primary transition-colors"
                         >
                             {collapsed ? <ChevronRight size={16} /> : <ChevronLeft size={16} />}

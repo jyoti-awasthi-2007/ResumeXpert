@@ -5,12 +5,18 @@ import { Bell, Search, Menu } from 'lucide-react'
 
 export default function DashboardLayout({ children, title }) {
     const [sidebarOpen, setSidebarOpen] = useState(false)
+    const [sidebarCollapsed, setSidebarCollapsed] = useState(false)
 
     return (
         <div className="min-h-screen" style={{ background: 'var(--color-surface-secondary)' }}>
-            <Sidebar open={sidebarOpen} onClose={() => setSidebarOpen(false)} />
+            <Sidebar
+                open={sidebarOpen}
+                onClose={() => setSidebarOpen(false)}
+                collapsed={sidebarCollapsed}
+                onToggleCollapse={() => setSidebarCollapsed((prev) => !prev)}
+            />
 
-            <div className="lg:ml-[280px] transition-all duration-300">
+            <div className={`transition-all duration-300 ${sidebarCollapsed ? 'lg:ml-[88px]' : 'lg:ml-[280px]'}`}>
                 <motion.header
                     initial={{ y: -20, opacity: 0 }}
                     animate={{ y: 0, opacity: 1 }}

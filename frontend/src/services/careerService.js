@@ -1,17 +1,10 @@
-import { careerMatches } from '../data/mockData'
+import api from './api'
 
-export function getCareers() {
-  return new Promise((resolve) => {
-    setTimeout(() => resolve(careerMatches), 700)
-  })
+export async function getCareers() {
+  return (await api.get('/careers')).data
 }
 
-export function getCareerById(id) {
-  return new Promise((resolve, reject) => {
-    setTimeout(() => {
-      const career = careerMatches.find((item) => item.id === id)
-      if (career) resolve(career)
-      else reject(new Error('Career not found'))
-    }, 600)
-  })
+export async function recommendCareers(skills) {
+  const response = await api.post('/careers/recommend', { skills: skills || [], top_n: 5 })
+  return response.data?.recommendations || response.data || []
 }

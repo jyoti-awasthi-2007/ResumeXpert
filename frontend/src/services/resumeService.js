@@ -1,20 +1,11 @@
-import { resumeOverview } from '../data/mockData'
+import api from './api'
 
-export function uploadResume(file) {
-  return new Promise((resolve) => {
-    setTimeout(() => {
-      resolve({
-        success: true,
-        fileName: file?.name || 'resume.pdf',
-      })
-    }, 600)
-  })
+export async function uploadResume(file) {
+  const formData = new FormData()
+  formData.append('resume', file)
+  return (await api.post('/resumes/upload', formData)).data
 }
 
-export function analyzeResume() {
-  return new Promise((resolve) => {
-    setTimeout(() => {
-      resolve(resumeOverview)
-    }, 1200)
-  })
+export async function analyzeResume(resumeId) {
+  return (await api.post(`/resumes/${resumeId}/analyze`)).data
 }

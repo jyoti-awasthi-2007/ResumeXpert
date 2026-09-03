@@ -144,8 +144,10 @@ Personalized Next Steps
 
 ### Backend
 
-* Python
+* Python 3.11+
 * FastAPI
+* Uvicorn
+* SQLite for local development (PostgreSQL can be added behind the database layer)
 
 ### AI / NLP
 
@@ -214,3 +216,29 @@ CareerLens AI transforms traditional resume analysis into an intelligent career 
 **Resume Analysis + NLP + Skill Extraction + Career Recommendation + Skill Gap Analysis + AI Assessment + Skill Confidence + Career Readiness**
 
 > **Don't just analyze the resume. Understand the candidate.**
+
+## Local Development
+
+Install backend dependencies and start the API:
+
+```powershell
+cd backend
+python -m venv .venv
+.\.venv\Scripts\Activate.ps1
+pip install -r requirements.txt
+alembic upgrade head
+python -m app.seed
+uvicorn app.main:app --reload
+```
+
+In a second terminal, start the existing frontend:
+
+```powershell
+cd frontend
+npm install
+npm run dev
+```
+
+The API is available at `http://localhost:8000`, Swagger at `http://localhost:8000/docs`, and the frontend at `http://localhost:5173`. Copy `backend/.env.example` to `backend/.env` and `frontend/.env.example` to `frontend/.env` when changing local URLs.
+
+Run backend tests with `cd backend; pytest`. The main flow is upload (`POST /api/resumes/upload`), analyze (`POST /api/resumes/{resume_id}/analyze`), recommend (`POST /api/careers/recommend`), skill gap (`POST /api/skill-gap/analyze`), recommendations (`POST /api/recommendations/skills`), assessment generation/submission, confidence, claim comparison, readiness, and analytics. Assessment generation deliberately omits the server-side answer key.

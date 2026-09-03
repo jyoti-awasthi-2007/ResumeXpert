@@ -3,9 +3,11 @@ import DashboardLayout from '../layouts/DashboardLayout'
 import PageTransition from '../components/PageTransition'
 import ClaimComparison from '../components/ClaimComparison'
 import { ShieldCheck, Sparkles } from 'lucide-react'
+import { useNavigate } from 'react-router-dom'
 
 export default function ClaimComparisonPage() {
   const { claimComparison, resumeState } = useCareerLens()
+  const navigate = useNavigate()
 
   if (!resumeState.uploaded) {
     return (

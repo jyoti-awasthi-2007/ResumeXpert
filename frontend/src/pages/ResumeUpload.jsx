@@ -4,25 +4,24 @@ import { Brain, Sparkles, Tag, CheckCircle, Loader2 } from 'lucide-react'
 import DashboardLayout from '../layouts/DashboardLayout'
 import UploadBox from '../components/UploadBox'
 import PageTransition from '../components/PageTransition'
-
-const mockSkills = ['React.js', 'Node.js', 'TypeScript', 'Python', 'AWS', 'Docker', 'GraphQL', 'MongoDB', 'Git', 'CI/CD', 'REST APIs', 'Agile']
+import { useCareerLens } from '../context/CareerLensContext'
 
 export default function ResumeUpload() {
+    const { uploadResume, error } = useCareerLens()
     const [stage, setStage] = useState('upload') // upload | scanning | results
     const [extractedSkills, setExtractedSkills] = useState([])
 
-    const handleUpload = () => {
+    const handleUpload = async (files) => {
+        const file = files?.[0]
+        if (!file) return
         setStage('scanning')
-        let i = 0
-        const interval = setInterval(() => {
-            if (i < mockSkills.length) {
-                setExtractedSkills(prev => [...prev, mockSkills[i]])
-                i++
-            } else {
-                clearInterval(interval)
-                setTimeout(() => setStage('results'), 500)
-            }
-        }, 300)
+        try {
+            const analysis = await uploadResume(file)
+            setExtractedSkills(analysis.skills?.map((skill) => skill.name) || [])
+            setStage('results')
+        } catch {
+            setStage('upload')
+        }
     }
 
     return (
@@ -50,6 +49,7 @@ export default function ResumeUpload() {
                                     description="PDF, DOC, or DOCX — Max 10MB"
                                     onFilesSelected={handleUpload}
                                 />
+                                {error && <p className="mt-4 text-sm text-red-300">{error}</p>}
                             </div>
                         </motion.div>
                     )}
@@ -117,7 +117,7 @@ export default function ResumeUpload() {
                                 </h3>
                                 <div className="flex flex-wrap gap-2">
                                     <AnimatePresence>
-                                        {extractedSkills.map((skill, i) => (
+                                        {extractedSkills.map((skill) => (
                                             <motion.span
                                                 key={skill}
                                                 initial={{ opacity: 0, scale: 0, y: 10 }}
