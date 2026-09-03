@@ -1,4 +1,5 @@
 import { Routes, Route } from 'react-router-dom'
+import DashboardLayout from './layouts/DashboardLayout'
 
 import LandingPage from './pages/LandingPage'
 import LoginPage from './pages/LoginPage'
@@ -26,24 +27,26 @@ function App() {
       <Route path="/"                   element={<LandingPage />} />
       <Route path="/login"              element={<LoginPage />} />
       <Route path="/signup"             element={<SignupPage />} />
-      <Route path="/dashboard"          element={<Dashboard />} />
-      <Route path="/upload-resume"      element={<ResumeUpload />} />
-      <Route path="/resume"             element={<ResumeUpload />} />
-      <Route path="/resume-analysis"    element={<ResumeAnalysis />} />
-      <Route path="/skills"             element={<Skills />} />
-      <Route path="/career-suggestions" element={<CareerSuggestions />} />
-      <Route path="/careers"            element={<CareerSuggestions />} />
-      <Route path="/career/:careerId"   element={<CareerDetails />} />
-      <Route path="/skill-gap"          element={<SkillGap />} />
-      <Route path="/recommendations"    element={<Recommendations />} />
-      <Route path="/assessment"         element={<Assessment />} />
-      <Route path="/assessment/:level"  element={<AssessmentLevel />} />
-      <Route path="/assessment/results" element={<AssessmentResults />} />
-      <Route path="/confidence"         element={<Confidence />} />
-      <Route path="/claim-vs-actual"    element={<ClaimComparisonPage />} />
-      <Route path="/career-readiness"   element={<CareerReadiness />} />
-      <Route path="/analytics"          element={<Analytics />} />
-      <Route path="/settings"           element={<Settings />} />
+      <Route element={<DashboardLayout />}>
+        <Route path="/dashboard"          element={<Dashboard />} />
+        <Route path="/upload-resume"      element={<ResumeUpload />} />
+        <Route path="/resume"             element={<ResumeUpload />} />
+        <Route path="/resume-analysis"    element={<ResumeAnalysis />} />
+        <Route path="/skills"             element={<Skills />} />
+        <Route path="/career-suggestions" element={<CareerSuggestions />} />
+        <Route path="/careers"            element={<CareerSuggestions />} />
+        <Route path="/career/:careerId"   element={<CareerDetails />} />
+        <Route path="/skill-gap"          element={<SkillGap />} />
+        <Route path="/recommendations"    element={<Recommendations />} />
+        <Route path="/assessment"         element={<Assessment />} />
+        <Route path="/assessment/:level"  element={<AssessmentLevel />} />
+        <Route path="/assessment/results" element={<AssessmentResults />} />
+        <Route path="/confidence"         element={<Confidence />} />
+        <Route path="/claim-vs-actual"    element={<ClaimComparisonPage />} />
+        <Route path="/career-readiness"   element={<CareerReadiness />} />
+        <Route path="/analytics"          element={<Analytics />} />
+        <Route path="/settings"           element={<Settings />} />
+      </Route>
     </Routes>
   )
 }
