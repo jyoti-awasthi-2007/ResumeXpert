@@ -61,6 +61,11 @@ class AIProvider(ABC):
         """Generate personalized skill recommendations."""
         pass
 
+    @abstractmethod
+    def chat(self, message: str, context: Optional[str] = None) -> str:
+        """Answer a user help question."""
+        pass
+
 
 class OpenAIProvider(AIProvider):
     """OpenAI GPT provider implementation."""
@@ -241,6 +246,37 @@ Generate 3-5 recommendations with highest priority skills first."""
             logger.error(f"Error generating recommendations: {error}")
             return self._get_fallback_recommendations(missing_skills, career_path)
 
+    def chat(self, message: str, context: Optional[str] = None) -> str:
+        """Answer a user help question with the configured Groq-compatible model."""
+        prompt = f"""You are CareerLens AI support. Help the user use this resume and career analysis application.
+Give a clear, concise, practical answer. If the issue is a technical error, suggest checks without exposing secrets.
+Application context: {context or 'No additional context provided'}
+User question: {message}"""
+        try:
+            response = self.client.chat.completions.create(
+                model=self.model,
+                messages=[
+                    {"role": "system", "content": "You are a helpful support assistant for CareerLens AI."},
+                    {"role": "user", "content": prompt},
+                ],
+                temperature=0.4,
+                timeout=self.timeout,
+            )
+            return response.choices[0].message.content.strip()
+        except Exception as error:
+            logger.error(f"Error generating chat response: {error}")
+            return self._fallback_chat(message)
+
+    @staticmethod
+    def _fallback_chat(message: str) -> str:
+        """Provide useful support when the AI service is temporarily unavailable."""
+        question = message.lower()
+        if "upload" in question or "pdf" in question:
+            return "Make sure the backend is running on port 8000, then try a PDF or DOCX under 10 MB."
+        if "skill" in question:
+            return "Upload your resume first. CareerLens extracts recognized skills and uses them for career matches and skill-gap analysis."
+        return "I can help with resume uploads, skill extraction, career matches, assessments, and navigation. Please describe the issue you are seeing."
+
     @staticmethod
     def _get_fallback_mcq(skill: str, difficulty: str) -> dict[str, Any]:
         """Fallback MCQ when AI is unavailable."""
@@ -365,6 +401,10 @@ class FallbackAIProvider(AIProvider):
             })
         return recommendations
 
+    def chat(self, message: str, context: Optional[str] = None) -> str:
+        """Provide support guidance without an external AI service."""
+        return OpenAIProvider._fallback_chat(message)
+
 
 class AIService:
     """Service for AI operations with provider abstraction."""
@@ -437,6 +477,10 @@ class AIService:
         return self.provider.generate_recommendations(
             user_skills, missing_skills, career_path
         )
+
+    def chat(self, message: str, context: Optional[str] = None) -> str:
+        """Answer a user help question."""
+        return self.provider.chat(message, context)
 
 
 # Global AI service instance

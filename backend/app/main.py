@@ -5,7 +5,7 @@ from fastapi import FastAPI
 from fastapi.middleware.cors import CORSMiddleware
 
 from app.config import settings
-from app.routers import analytics, assessment, career, health, resume, skill
+from app.routers import analytics, assessment, career, chat, health, resume, skill
 
 # Configure logging
 logging.basicConfig(
@@ -24,7 +24,7 @@ app = FastAPI(
 # Add CORS middleware
 app.add_middleware(
     CORSMiddleware,
-    allow_origins=[settings.FRONTEND_URL],
+    allow_origins=list({settings.FRONTEND_URL, "http://localhost:5173", "http://127.0.0.1:5173"}),
     allow_credentials=True,
     allow_methods=["*"],
     allow_headers=["*"],
@@ -37,6 +37,7 @@ app.include_router(career.router)
 app.include_router(skill.router)
 app.include_router(assessment.router)
 app.include_router(analytics.router)
+app.include_router(chat.router)
 
 
 @app.on_event("startup")

@@ -1,8 +1,9 @@
 import { Link, useLocation } from 'react-router-dom'
 import { motion } from 'framer-motion'
-import { Shield, Menu, X } from 'lucide-react'
+import { Menu, X } from 'lucide-react'
 import { useState } from 'react'
 import AnimatedButton from './AnimatedButton'
+import logo from '../assets/image.png'
 
 const navLinks = [
     { name: 'Features', href: '#features' },
@@ -25,10 +26,7 @@ export default function Navbar() {
             <div className="mx-auto max-w-7xl px-4 sm:px-6 lg:px-8">
                 <div className="glass-card mt-4 px-6 py-3 flex items-center justify-between">
                     <Link to="/" className="flex items-center gap-3 group">
-                        <div className="w-10 h-10 rounded-lg sig-gradient flex items-center justify-center group-hover:shadow-[0_8px_30px_rgba(49,87,232,0.12)] transition-shadow">
-                            <Shield size={20} className="text-white" />
-                        </div>
-                        <span className="text-xl font-bold gradient-text">VerifyAI</span>
+                        <img src={logo} alt="ResumeXpert" className="w-44 h-auto object-contain" />
                     </Link>
 
                     {isLanding && (

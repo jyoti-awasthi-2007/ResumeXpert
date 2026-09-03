@@ -222,13 +222,12 @@ CareerLens AI transforms traditional resume analysis into an intelligent career 
 Install backend dependencies and start the API:
 
 ```powershell
-cd backend
-python -m venv .venv
-.\.venv\Scripts\Activate.ps1
+cd D:\jyoti\AI-Resume-System\backend
+..\.venv\Scripts\Activate.ps1
 pip install -r requirements.txt
 alembic upgrade head
 python -m app.seed
-uvicorn app.main:app --reload
+python -m uvicorn app.main:app --reload --host 0.0.0.0 --port 8000
 ```
 
 In a second terminal, start the existing frontend:

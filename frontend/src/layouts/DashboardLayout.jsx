@@ -43,7 +43,7 @@ export default function DashboardLayout({ children, title }) {
                     onToggleCollapse={() => setSidebarCollapsed((prev) => !prev)}
                 />
 
-                <div className={`transition-all duration-300 ${sidebarCollapsed ? 'lg:ml-[88px]' : 'lg:ml-[280px]'}`}>
+                <div className={`transition-all duration-300 ${sidebarCollapsed ? 'lg:ml-22' : 'lg:ml-70'}`}>
                     <motion.header
                         initial={{ y: -20, opacity: 0 }}
                         animate={{ y: 0, opacity: 1 }}
@@ -59,7 +59,7 @@ export default function DashboardLayout({ children, title }) {
                             </button>
                             <div>
                                 <h1 className="text-lg sm:text-2xl font-semibold text-primary truncate">{pageTitle}</h1>
-                                <p className="text-sm text-secondary">CareerLens AI</p>
+                                <p className="text-sm text-secondary">ResumeXpert workspace</p>
                             </div>
                         </div>
 
@@ -81,7 +81,7 @@ export default function DashboardLayout({ children, title }) {
                         </div>
                     </motion.header>
 
-                    <main className="p-4 sm:p-6 lg:p-8">
+                    <main className="page-shell p-4 sm:p-6 lg:p-8">
                         {children || <Outlet />}
                     </main>
                 </div>

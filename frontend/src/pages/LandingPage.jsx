@@ -229,14 +229,14 @@ export default function LandingPage() {
                             <div className="w-8 h-8 rounded-lg" style={{ background: 'linear-gradient(90deg,var(--grad-1),var(--grad-2))', display: 'flex', alignItems: 'center', justifyContent: 'center' }}>
                                 <Shield size={16} className="text-white" />
                             </div>
-                            <span className="font-bold gradient-text">VerifyAI</span>
+                            <span className="font-bold gradient-text">ResumeXpert</span>
                         </div>
                         <div className="flex items-center gap-6 text-sm text-white/80">
                             <a href="#" className="hover:text-white transition-colors">Privacy</a>
                             <a href="#" className="hover:text-white transition-colors">Terms</a>
                             <a href="#" className="hover:text-white transition-colors">Contact</a>
                         </div>
-                        <p className="text-sm text-white/60">© 2026 VerifyAI. All rights reserved.</p>
+                        <p className="text-sm text-white/60">© 2026 ResumeXpert. All rights reserved.</p>
                     </div>
                 </footer>
             </GradientBackground>

@@ -1,10 +1,11 @@
 import { useState } from 'react'
 import { Link, useNavigate } from 'react-router-dom'
 import { motion } from 'framer-motion'
-import { Mail, Lock, Eye, EyeOff, User, Shield } from 'lucide-react'
+import { Mail, Lock, Eye, EyeOff, User } from 'lucide-react'
 import GradientBackground from '../components/GradientBackground'
 import AnimatedButton from '../components/AnimatedButton'
 import PageTransition from '../components/PageTransition'
+import logo from '../assets/image.png'
 
 export default function SignupPage() {
     const [name, setName] = useState('')
@@ -35,10 +36,7 @@ export default function SignupPage() {
                     >
                         <div className="text-center mb-8">
                             <Link to="/" className="inline-flex items-center gap-2 mb-6">
-                                <div className="w-10 h-10 rounded-xl bg-linear-to-br from-primary to-accent flex items-center justify-center">
-                                    <Shield size={22} className="text-white" />
-                                </div>
-                                <span className="text-2xl font-bold gradient-text">VerifyAI</span>
+                                <img src={logo} alt="ResumeXpert" className="w-52 h-auto object-contain" />
                             </Link>
                             <h1 className="text-3xl font-bold text-white mb-2">Create your account</h1>
                             <p className="text-white/40">Start verifying credentials today</p>

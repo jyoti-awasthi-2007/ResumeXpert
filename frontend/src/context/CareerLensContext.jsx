@@ -123,14 +123,18 @@ export function CareerLensProvider({ children }) {
 
       // Extract skill names and pass to recommend endpoint (expects skills array, not resume_id)
       const skillNames = (analysis.skills || []).map((s) => s.name).filter(Boolean)
-      const recommendationsResult = await recommendCareers(skillNames)
-      const normalizedCareerMatches = Array.isArray(recommendationsResult) && recommendationsResult.length > 0
-        ? recommendationsResult.map(normalizeCareerMatch)
-        : careerMatches
+      try {
+        const recommendationsResult = await recommendCareers(skillNames)
+        const normalizedCareerMatches = Array.isArray(recommendationsResult) && recommendationsResult.length > 0
+          ? recommendationsResult.map(normalizeCareerMatch)
+          : careerMatches
 
-      setCareerMatches(normalizedCareerMatches)
-      if (normalizedCareerMatches.length && !normalizedCareerMatches.some((item) => item.id === selectedCareerId)) {
-        setSelectedCareerId(normalizedCareerMatches[0].id)
+        setCareerMatches(normalizedCareerMatches)
+        if (normalizedCareerMatches.length && !normalizedCareerMatches.some((item) => item.id === selectedCareerId)) {
+          setSelectedCareerId(normalizedCareerMatches[0].id)
+        }
+      } catch (recommendationError) {
+        console.warn('Career recommendations unavailable after resume analysis:', recommendationError)
       }
       return analysis
     } catch (requestError) {

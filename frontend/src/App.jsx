@@ -1,5 +1,6 @@
 import { Routes, Route } from 'react-router-dom'
 import DashboardLayout from './layouts/DashboardLayout'
+import HelpChatbot from './components/HelpChatbot'
 
 import LandingPage from './pages/LandingPage'
 import LoginPage from './pages/LoginPage'
@@ -23,11 +24,12 @@ import Settings from './pages/Settings'
 
 function App() {
   return (
-    <Routes>
-      <Route path="/"                   element={<LandingPage />} />
+    <>
+      <Routes>
+        <Route path="/"                   element={<LandingPage />} />
       <Route path="/login"              element={<LoginPage />} />
       <Route path="/signup"             element={<SignupPage />} />
-      <Route element={<DashboardLayout />}>
+        <Route element={<DashboardLayout />}>
         <Route path="/dashboard"          element={<Dashboard />} />
         <Route path="/upload-resume"      element={<ResumeUpload />} />
         <Route path="/resume"             element={<ResumeUpload />} />
@@ -46,8 +48,10 @@ function App() {
         <Route path="/career-readiness"   element={<CareerReadiness />} />
         <Route path="/analytics"          element={<Analytics />} />
         <Route path="/settings"           element={<Settings />} />
-      </Route>
-    </Routes>
+        </Route>
+      </Routes>
+      <HelpChatbot />
+    </>
   )
 }
 

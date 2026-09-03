@@ -16,6 +16,7 @@ import {
     LogOut,
     X,
 } from 'lucide-react'
+import logo from '../assets/image.png'
 
 const sections = [
     {
@@ -93,19 +94,16 @@ export default function Sidebar({ open, onClose, collapsed, onToggleCollapse }) 
                     width: collapsed ? 88 : 280,
                 }}
                 transition={{ duration: 0.3, ease: 'easeInOut' }}
-                className={`fixed left-0 top-0 bottom-0 z-50 bg-surface border-r border-surface flex flex-col
+                className={`fixed left-0 top-0 bottom-0 z-50 bg-surface border-r border-surface flex flex-col shadow-[8px_0_30px_rgba(28,91,125,0.06)]
           ${open ? 'translate-x-0' : '-translate-x-full'}
           lg:translate-x-0`}
                 style={{ borderRadius: 0 }}
             >
                 <div className={`flex items-center ${collapsed ? 'justify-center' : 'justify-between'} p-5 border-b border-surface`}>
                     {!collapsed && (
-                        <div className="flex items-center gap-3">
-                            <div className="w-10 h-10 rounded-2xl bg-primary flex items-center justify-center text-white shadow-sm">
-                                <Shield size={18} />
-                            </div>
+                        <div className="flex items-center gap-3 min-w-0">
+                            <img src={logo} alt="ResumeXpert" className="w-40 h-auto object-contain" />
                             <div>
-                                <p className="text-sm font-semibold text-primary">CareerLens AI</p>
                                 <p className="text-xs text-secondary">Career intelligence hub</p>
                             </div>
                         </div>
@@ -119,7 +117,7 @@ export default function Sidebar({ open, onClose, collapsed, onToggleCollapse }) 
                         </button>
                         <button
                             onClick={onToggleCollapse}
-                            className="hidden lg:flex w-9 h-9 rounded-xl bg-surface-secondary flex items-center justify-center text-secondary hover:text-primary transition-colors"
+                            className="hidden lg:flex w-9 h-9 rounded-xl bg-surface-secondary items-center justify-center text-secondary hover:text-primary transition-colors"
                         >
                             {collapsed ? <ChevronRight size={16} /> : <ChevronLeft size={16} />}
                         </button>
