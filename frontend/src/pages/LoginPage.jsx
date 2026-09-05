@@ -5,7 +5,7 @@ import { Mail, Lock, Eye, EyeOff } from 'lucide-react'
 import GradientBackground from '../components/GradientBackground'
 import AnimatedButton from '../components/AnimatedButton'
 import PageTransition from '../components/PageTransition'
-import logo from '../assets/image.png'
+import BrandLockup from '../components/BrandLockup'
 
 export default function LoginPage() {
     const [email, setEmail] = useState('')
@@ -30,8 +30,8 @@ export default function LoginPage() {
                         className="w-full max-w-md"
                     >
                         <div className="text-center mb-8">
-                            <Link to="/" className="inline-flex items-center gap-2 mb-6">
-                                <img src={logo} alt="ResumeXpert" className="w-52 h-auto object-contain" />
+                            <Link to="/" className="inline-flex mb-6">
+                                <BrandLockup />
                             </Link>
                             <h1 className="text-3xl font-bold text-white mb-2">Welcome back</h1>
                             <p className="text-white/40">Sign in to your account</p>

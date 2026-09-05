@@ -1,4 +1,4 @@
-@import url('https://fonts.googleapis.com/css2?family=Manrope:wght@400;500;600;700;800&display=swap');
+@import url('https://fonts.googleapis.com/css2?family=Manrope:wght@400;500;600;700;800&family=Outfit:wght@500;600;700&display=swap');
 @import "tailwindcss";
 
 @theme {
@@ -16,6 +16,7 @@
   --color-warning: #f59e0b;
   --color-danger: #FF3B30; /* keep red for errors */
   --font-sans: 'Manrope', ui-sans-serif, system-ui, sans-serif;
+  --font-display: 'Outfit', 'Manrope', ui-sans-serif, system-ui, sans-serif;
   --grad-1: #0878c9;
   --grad-2: #16c7d8;
   --grad-3: #f06b2d;

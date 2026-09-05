@@ -16,7 +16,7 @@ import {
     LogOut,
     X,
 } from 'lucide-react'
-import logo from '../assets/image.png'
+import BrandLockup from './BrandLockup'
 
 const sections = [
     {
@@ -101,12 +101,7 @@ export default function Sidebar({ open, onClose, collapsed, onToggleCollapse }) 
             >
                 <div className={`flex items-center ${collapsed ? 'justify-center' : 'justify-between'} p-5 border-b border-surface`}>
                     {!collapsed && (
-                        <div className="flex items-center gap-3 min-w-0">
-                            <img src={logo} alt="ResumeXpert" className="w-40 h-auto object-contain" />
-                            <div>
-                                <p className="text-xs text-secondary">Career intelligence hub</p>
-                            </div>
-                        </div>
+                        <BrandLockup compact />
                     )}
                     <div className="flex items-center gap-2">
                         <button

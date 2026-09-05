@@ -3,7 +3,7 @@ import { motion } from 'framer-motion'
 import { Menu, X } from 'lucide-react'
 import { useState } from 'react'
 import AnimatedButton from './AnimatedButton'
-import logo from '../assets/image.png'
+import BrandLockup from './BrandLockup'
 
 const navLinks = [
     { name: 'Features', href: '#features' },
@@ -23,14 +23,14 @@ export default function Navbar() {
             transition={{ duration: 0.6, ease: 'easeOut' }}
             className="fixed top-0 left-0 right-0 z-50"
         >
-            <div className="mx-auto max-w-7xl px-4 sm:px-6 lg:px-8">
-                <div className="glass-card mt-4 px-6 py-3 flex items-center justify-between">
-                    <Link to="/" className="flex items-center gap-3 group">
-                        <img src={logo} alt="ResumeXpert" className="w-44 h-auto object-contain" />
+            <div className="mx-auto max-w-7xl px-3 sm:px-6 lg:px-8">
+                <div className="glass-card mt-3 px-4 py-2 sm:px-5 flex items-center justify-between">
+                    <Link to="/" className="flex items-center gap-2.5 group shrink-0" aria-label="ResumeXpert home">
+                        <BrandLockup compact />
                     </Link>
 
                     {isLanding && (
-                        <div className="hidden md:flex items-center gap-8">
+                        <div className="hidden md:flex items-center gap-6">
                             {navLinks.map(link => (
                                 <a
                                     key={link.name}
