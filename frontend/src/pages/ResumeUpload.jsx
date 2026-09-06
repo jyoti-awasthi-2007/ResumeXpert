@@ -5,9 +5,11 @@ import DashboardLayout from '../layouts/DashboardLayout'
 import UploadBox from '../components/UploadBox'
 import PageTransition from '../components/PageTransition'
 import { useCareerLens } from '../context/CareerLensContext'
+import { useAuth } from '../context/AuthContext'
 
 export default function ResumeUpload() {
     const { uploadResume, error } = useCareerLens()
+    const { uploadToStorage } = useAuth()
     const [stage, setStage] = useState('upload') // upload | scanning | results
     const [extractedSkills, setExtractedSkills] = useState([])
 
@@ -16,6 +18,7 @@ export default function ResumeUpload() {
         if (!file) return
         setStage('scanning')
         try {
+            await uploadToStorage(file)
             const analysis = await uploadResume(file)
             setExtractedSkills(analysis.skills?.map((skill) => skill.name) || [])
             setStage('results')

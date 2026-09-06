@@ -3,19 +3,12 @@ import { apiError } from '../services/api'
 import api from '../services/api'
 import { uploadResume as uploadResumeRequest, analyzeResume } from '../services/resumeService'
 import { getCareers, recommendCareers } from '../services/careerService'
-import { generateAssessment, submitAssessment as submitAssessmentRequest } from '../services/assessmentService'
+import { generateAssessment, submitAssessment as submitAssessmentRequest, getAssessmentResult } from '../services/assessmentService'
+import { useAuth } from './AuthContext'
 import {
-  user,
   nlpProcessing,
-  skills as skillList,
-  careerMatches as careerList,
-  skillGap as defaultSkillGap,
-  recommendations as defaultRecommendations,
   assessmentLevels,
-  assessmentResult as defaultAssessmentResult,
-  claimComparison,
   confidenceLevels,
-  readinessOverview,
   nextSteps,
   analyticsOverview,
 } from '../data/mockData'
@@ -55,26 +48,55 @@ const normalizeRecommendation = (item = {}) => ({
   difficulty: item.difficulty || 'Intermediate',
 })
 
+const normalizeAssessmentResult = (result = {}) => ({
+  ...result,
+  status: result.status || 'complete',
+  skills: result.skills || (result.skill_scores || []).map((item) => ({ name: item.skill, score: item.score })),
+  summary: result.summary || { correct: result.correct || 0, incorrect: result.incorrect || 0, total: result.total || 0 },
+})
+
 export function CareerLensProvider({ children }) {
-  const [selectedCareerId, setSelectedCareerId] = useState(careerList[0].id)
+  const { user: authUser, profile, saveProgress, logActivity } = useAuth()
+  const [selectedCareerId, setSelectedCareerId] = useState(null)
   const [resumeState, setResumeState] = useState({ uploaded: false, processing: false, analysis: null, id: null })
-  const [skills, setSkills] = useState(skillList)
-  const [careerMatches, setCareerMatches] = useState(careerList)
-  const [skillGap, setSkillGap] = useState(defaultSkillGap)
-  const [recommendations, setRecommendations] = useState(defaultRecommendations)
-  const [assessmentResult, setAssessmentResult] = useState(defaultAssessmentResult)
-  const [confidence, setConfidence] = useState(82)
-  const [claimComparisonState, setClaimComparison] = useState(claimComparison)
-  const [readinessOverviewState, setReadinessOverview] = useState(readinessOverview)
-  const [analyticsOverviewState, setAnalyticsOverview] = useState(analyticsOverview)
+  const [skills, setSkills] = useState([])
+  const [careerMatches, setCareerMatches] = useState([])
+  const [skillGap, setSkillGap] = useState(normalizeSkillGap())
+  const [recommendations, setRecommendations] = useState([])
+  const [assessmentResult, setAssessmentResult] = useState(null)
+  const [confidence, setConfidence] = useState(0)
+  const [claimComparisonState, setClaimComparison] = useState([])
+  const [readinessOverviewState, setReadinessOverview] = useState({ score: 0, status: 'Waiting for resume', breakdown: {}, strengths: [], improvements: [] })
+  const [analyticsOverviewState, setAnalyticsOverview] = useState({ main: {} })
   const [error, setError] = useState('')
+
+  useEffect(() => {
+    if (!profile) return
+    const savedSkills = Array.isArray(profile.skills) && profile.skills.length
+      ? profile.skills
+      : profile.resume_state?.analysis?.skills || []
+    setSkills(savedSkills.map((skill) => typeof skill === 'string' ? { id: skill.toLowerCase().replace(/\s+/g, '-'), name: skill, category: 'Skills', confidence: 0 } : skill))
+    if (profile.resume_state) setResumeState(profile.resume_state)
+    if (profile.selected_career_id) setSelectedCareerId(profile.selected_career_id)
+    if (profile.skill_gap) setSkillGap(normalizeSkillGap(profile.skill_gap))
+    if (Array.isArray(profile.recommendations)) setRecommendations(profile.recommendations)
+    if (profile.assessment_result) setAssessmentResult(normalizeAssessmentResult(profile.assessment_result))
+    if (typeof profile.confidence === 'number') setConfidence(profile.confidence)
+    const savedSkillNames = savedSkills.map((skill) => typeof skill === 'string' ? skill : skill.name).filter(Boolean)
+    if (savedSkillNames.length) {
+      recommendCareers(savedSkillNames).then((items) => {
+        const normalized = Array.isArray(items) ? items.map(normalizeCareerMatch) : []
+        if (normalized.length) setCareerMatches(normalized)
+      }).catch(() => {})
+    }
+  }, [profile])
 
   useEffect(() => {
     getCareers()
       .then((items) => {
         const normalized = Array.isArray(items) ? items.map(normalizeCareerMatch) : []
-        setCareerMatches(normalized.length ? normalized : careerList)
-        if (normalized.length && !normalized.some((item) => item.id === selectedCareerId)) {
+        setCareerMatches(normalized)
+        if (normalized.length && (!selectedCareerId || !normalized.some((item) => item.id === selectedCareerId))) {
           setSelectedCareerId(normalized[0].id)
         }
       })
@@ -83,6 +105,7 @@ export function CareerLensProvider({ children }) {
 
   useEffect(() => {
     if (!resumeState.id) return
+    if (!selectedCareerId) return
     const request = { resume_id: resumeState.id, career_id: selectedCareerId }
     Promise.all([
       api.post('/skill-gap/analyze', request),
@@ -92,12 +115,27 @@ export function CareerLensProvider({ children }) {
       api.get('/career-readiness/demo-user'),
       api.get('/analytics/dashboard/demo-user'),
     ]).then(([gap, skillsResult, confidenceResult, claimsResult, readinessResult, analyticsResult]) => {
-      setSkillGap(normalizeSkillGap(gap.data))
-      setRecommendations(Array.isArray(skillsResult.data?.recommendations) ? skillsResult.data.recommendations.map(normalizeRecommendation) : Array.isArray(skillsResult.data) ? skillsResult.data.map(normalizeRecommendation) : [])
+      const nextSkillGap = normalizeSkillGap(gap.data)
+      const nextRecommendations = Array.isArray(skillsResult.data?.recommendations) ? skillsResult.data.recommendations.map(normalizeRecommendation) : Array.isArray(skillsResult.data) ? skillsResult.data.map(normalizeRecommendation) : []
+      setSkillGap(nextSkillGap)
+      setRecommendations(nextRecommendations)
       setConfidence(confidenceResult.data[0]?.confidence_score || 0)
       setClaimComparison(claimsResult.data)
-      setReadinessOverview({ ...readinessOverviewState, ...readinessResult.data, score: readinessResult.data.score })
+      const readinessBreakdown = {
+        resume_quality: Number(resumeState.analysis?.score || 0),
+        skill_match: Number(selectedCareer?.score || nextSkillGap.overallMatch || 0),
+        assessment_score: Number(assessmentResult?.score || 0),
+        confidence: Number(confidence || 0),
+      }
+      const readinessValues = Object.values(readinessBreakdown).filter((value) => value > 0)
+      setReadinessOverview({
+        ...readinessOverviewState,
+        ...readinessResult.data,
+        score: readinessValues.length ? Math.round(readinessValues.reduce((sum, value) => sum + value, 0) / readinessValues.length) : 0,
+        breakdown: readinessBreakdown,
+      })
       setAnalyticsOverview({ ...analyticsOverviewState, main: analyticsResult.data })
+      saveProgress({ skill_gap: nextSkillGap, recommendations: nextRecommendations }).catch(() => {})
     }).catch(() => {})
   }, [resumeState.id, selectedCareerId, assessmentResult])
 
@@ -105,6 +143,27 @@ export function CareerLensProvider({ children }) {
     () => careerMatches.find((item) => item.id === selectedCareerId) || careerMatches[0],
     [careerMatches, selectedCareerId],
   )
+
+  const analyticsMain = useMemo(() => {
+    const resumeScore = Number(resumeState.analysis?.score || analyticsOverviewState.main?.resume_score || 0)
+    const skillMatch = Number(selectedCareer?.score || skillGap.overallMatch || analyticsOverviewState.main?.career_match || 0)
+    const assessmentScore = Number(assessmentResult?.score || analyticsOverviewState.main?.assessment_score || 0)
+    const confidenceScore = Number(confidence || analyticsOverviewState.main?.confidence_score || 0)
+    const scoredValues = [resumeScore, skillMatch, assessmentScore, confidenceScore].filter((value) => value > 0)
+    const careerReadiness = scoredValues.length ? Math.round(scoredValues.reduce((sum, value) => sum + value, 0) / scoredValues.length) : 0
+
+    return {
+      ...analyticsOverviewState.main,
+      resume_score: resumeScore,
+      skills_detected: skills.length,
+      career_match: skillMatch,
+      skill_gap_count: skillGap.missingSkills.length,
+      assessment_score: assessmentScore,
+      confidence_score: confidenceScore,
+      career_readiness: careerReadiness,
+      career_readiness_score: careerReadiness,
+    }
+  }, [analyticsOverviewState.main, assessmentResult, confidence, resumeState.analysis, selectedCareer, skillGap, skills.length])
 
   const uploadResume = async (file) => {
     setError('')
@@ -120,6 +179,11 @@ export function CareerLensProvider({ children }) {
 
       setResumeState({ uploaded: true, processing: false, analysis, id: uploaded.resume_id })
       setSkills(analysis.skills || [])
+      await saveProgress({
+        skills: analysis.skills || [],
+        resume_state: { uploaded: true, processing: false, analysis, id: uploaded.resume_id },
+      })
+      await logActivity('resume_analyzed', { resume_id: uploaded.resume_id, skill_count: analysis.skills?.length || 0 })
 
       // Extract skill names and pass to recommend endpoint (expects skills array, not resume_id)
       const skillNames = (analysis.skills || []).map((s) => s.name).filter(Boolean)
@@ -146,25 +210,36 @@ export function CareerLensProvider({ children }) {
 
   const selectCareer = (careerId) => {
     setSelectedCareerId(careerId)
-    api.post('/users/demo-user/career', { career_id: careerId }).catch(() => {})
+    saveProgress({ selected_career_id: careerId }).catch(() => {})
+    logActivity('career_selected', { career_id: careerId }).catch(() => {})
+    logActivity('career_selected', { career_id: careerId }).catch(() => {})
   }
 
   const submitAssessment = async (answers) => {
-    const result = await submitAssessmentRequest(window.sessionStorage.getItem('careerlens_assessment_id'), answers)
-    const updatedResult = { ...result, summary: { correct: result.correct, incorrect: result.incorrect, total: result.total } }
+    const assessmentId = window.sessionStorage.getItem('careerlens_assessment_id')
+    const result = await submitAssessmentRequest(assessmentId, answers)
+    const updatedResult = normalizeAssessmentResult(result)
     setAssessmentResult(updatedResult)
     setConfidence(result.score)
-    return updatedResult
+    saveProgress({ assessment_result: updatedResult, confidence: result.score }).catch(() => {})
+    logActivity('assessment_completed', { score: result.score }).catch(() => {})
+    return { ...updatedResult, assessment_id: assessmentId }
   }
 
   const generateAssessmentQuestions = useCallback(async (level) => {
-    const result = await generateAssessment(resumeState.id, selectedCareerId, level)
+    const result = await generateAssessment(resumeState.id, selectedCareerId, level, authUser?.id)
     window.sessionStorage.setItem('careerlens_assessment_id', result.assessment_id)
     return result
-  }, [resumeState.id, selectedCareerId])
+  }, [authUser?.id, resumeState.id, selectedCareerId])
+
+  const loadAssessmentResult = useCallback(async (assessmentId) => {
+    const result = normalizeAssessmentResult(await getAssessmentResult(assessmentId))
+    setAssessmentResult(result)
+    return result
+  }, [])
 
   const value = {
-    user,
+    user: { name: '', email: '', title: '' },
     resumeState,
     nlpProcessing,
     skills,
@@ -179,11 +254,12 @@ export function CareerLensProvider({ children }) {
     confidenceLevels,
     readinessOverview: readinessOverviewState,
     nextSteps,
-    analyticsOverview: analyticsOverviewState,
+    analyticsOverview: { ...analyticsOverviewState, main: analyticsMain },
     uploadResume,
     selectCareer,
     submitAssessment,
     generateAssessmentQuestions,
+    loadAssessmentResult,
     error,
   }
 

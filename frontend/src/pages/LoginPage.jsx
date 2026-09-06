@@ -5,17 +5,30 @@ import GradientBackground from '../components/GradientBackground'
 import AnimatedButton from '../components/AnimatedButton'
 import PageTransition from '../components/PageTransition'
 import BrandLockup from '../components/BrandLockup'
+import { useAuth } from '../context/AuthContext'
 
 export default function LoginPage() {
     const [email, setEmail] = useState('')
     const [password, setPassword] = useState('')
     const [showPassword, setShowPassword] = useState(false)
     const [focused, setFocused] = useState('')
+    const [error, setError] = useState('')
+    const [submitting, setSubmitting] = useState(false)
     const navigate = useNavigate()
+    const { signIn, configured } = useAuth()
 
-    const handleSubmit = (e) => {
+    const handleSubmit = async (e) => {
         e.preventDefault()
-        navigate('/dashboard')
+        setError('')
+        setSubmitting(true)
+        try {
+            const result = await signIn({ email, password })
+            navigate(result.profile ? '/dashboard' : '/profile-setup', { replace: true })
+        } catch (requestError) {
+            setError(requestError.message || 'Could not sign in.')
+        } finally {
+            setSubmitting(false)
+        }
     }
 
     return (
@@ -85,8 +98,10 @@ export default function LoginPage() {
                                     <a href="#" className="auth-link">Forgot password?</a>
                                 </div>
 
-                                <AnimatedButton type="submit" variant="primary" size="lg" className="auth-submit w-full">
-                                    Sign In <ArrowRight size={17} />
+                                {!configured && <p className="text-sm text-warning">Add Supabase keys to `frontend/.env` before signing in.</p>}
+                                {error && <p className="text-sm text-danger">{error}</p>}
+                                <AnimatedButton type="submit" disabled={submitting || !configured} variant="primary" size="lg" className="auth-submit w-full">
+                                    {submitting ? 'Signing in...' : <>Sign In <ArrowRight size={17} /></>}
                                 </AnimatedButton>
                             </form>
 

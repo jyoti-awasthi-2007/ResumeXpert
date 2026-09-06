@@ -87,7 +87,8 @@ export default function AssessmentLevel() {
             throw new Error(resultData?.message || 'The assessment result was not returned.')
           }
           setResult(resultData)
-          setFinished(true)
+          window.sessionStorage.setItem('careerlens_assessment_result_id', resultData.assessment_id)
+          navigate(`/assessment/results/${resultData.assessment_id}`, { replace: true })
         })
         .catch((requestError) => setError(requestError?.response?.data?.message || requestError?.message || 'Unable to submit the assessment.'))
         .finally(() => setSubmitting(false))

@@ -5,6 +5,7 @@ import GradientBackground from '../components/GradientBackground'
 import AnimatedButton from '../components/AnimatedButton'
 import PageTransition from '../components/PageTransition'
 import BrandLockup from '../components/BrandLockup'
+import { useAuth } from '../context/AuthContext'
 
 export default function SignupPage() {
     const [name, setName] = useState('')
@@ -12,11 +13,26 @@ export default function SignupPage() {
     const [password, setPassword] = useState('')
     const [showPassword, setShowPassword] = useState(false)
     const [focused, setFocused] = useState('')
+    const [error, setError] = useState('')
+    const [notice, setNotice] = useState('')
+    const [submitting, setSubmitting] = useState(false)
     const navigate = useNavigate()
+    const { signUp, configured } = useAuth()
 
-    const handleSubmit = (e) => {
+    const handleSubmit = async (e) => {
         e.preventDefault()
-        navigate('/dashboard')
+        setError('')
+        setNotice('')
+        setSubmitting(true)
+        try {
+            const result = await signUp({ name, email, password })
+            if (result.session) navigate('/profile-setup', { replace: true })
+            else setNotice('Account created. Check your email to confirm your account, then sign in to continue.')
+        } catch (requestError) {
+            setError(requestError.message || 'Could not create your account.')
+        } finally {
+            setSubmitting(false)
+        }
     }
 
     const strengthScore = password.length === 0 ? 0 : password.length < 4 ? 1 : password.length < 8 ? 2 : /[A-Z]/.test(password) && /[0-9]/.test(password) ? 4 : 3
@@ -111,8 +127,11 @@ export default function SignupPage() {
                                     )}
                                 </div>
 
-                                <AnimatedButton type="submit" variant="primary" size="lg" className="auth-submit w-full">
-                                    Create Account <ArrowRight size={17} />
+                                {!configured && <p className="text-sm text-warning">Add Supabase keys to `frontend/.env` before creating an account.</p>}
+                                {error && <p className="text-sm text-danger">{error}</p>}
+                                {notice && <p className="text-sm text-success">{notice}</p>}
+                                <AnimatedButton type="submit" disabled={submitting || !configured} variant="primary" size="lg" className="auth-submit w-full">
+                                    {submitting ? 'Creating account...' : <>Create Account <ArrowRight size={17} /></>}
                                 </AnimatedButton>
                             </form>
 

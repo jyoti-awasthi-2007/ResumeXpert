@@ -17,6 +17,17 @@ env/
 .env
 .env.*
 !.env.example
+backend/.env
+frontend/.env
+**/.env.local
+**/.env.*.local
+
+# Secret and credential files
+*.pem
+*.key
+*.p12
+*.pfx
+secrets/
 
 # Backend runtime data
 backend/uploads/*
@@ -24,6 +35,7 @@ backend/uploads/*
 backend/*.db
 backend/*.sqlite
 backend/*.sqlite3
+backend/uploads/assessments.json
 
 # Frontend dependencies and build output
 frontend/node_modules/

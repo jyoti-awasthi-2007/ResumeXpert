@@ -1,6 +1,7 @@
 """Assessment engine for quiz generation and scoring."""
 import logging
 import random
+from difflib import SequenceMatcher
 from typing import Any
 
 from app.ai import ai_service
@@ -87,7 +88,8 @@ class AssessmentEngine:
         self,
         skills: list[str],
         difficulty: str,
-        num_questions: int = 5
+        num_questions: int = 5,
+        career: str = ""
     ) -> list[dict[str, Any]]:
         """
         Generate assessment questions for given skills.
@@ -103,14 +105,23 @@ class AssessmentEngine:
         questions = []
         
         # Generate career-specific questions with the configured Groq provider first.
-        available_questions = self._generate_with_ai(skills, difficulty, num_questions)
+        available_questions = self._generate_with_ai(skills, difficulty, num_questions, career)
 
         # Keep the assessment usable when the provider is unavailable or returns too few questions.
         if len(available_questions) < num_questions:
             bank_questions = self._get_questions_from_bank(
-                skills, difficulty, num_questions - len(available_questions)
+                skills, difficulty, num_questions - len(available_questions),
+                {item.get("question", "") for item in available_questions}
             )
             available_questions.extend(bank_questions)
+
+        # A provider can return fewer unique questions than requested. Build
+        # deterministic, difficulty-specific fallbacks for the remaining slots.
+        if len(available_questions) < num_questions:
+            available_questions.extend(self._fallback_questions(
+                skills, difficulty, num_questions - len(available_questions),
+                {item.get("question", "") for item in available_questions},
+            ))
         
         # Format questions
         for i, q in enumerate(available_questions[:num_questions]):
@@ -118,7 +129,7 @@ class AssessmentEngine:
                 "id": f"q_{i}",
                 "question": q["question"],
                 "options": q["options"],
-                "skill": self._get_question_skill(q),
+                "skill": q.get("skill") or self._get_question_skill(q),
                 "difficulty": difficulty,
                 "correct_answer": q["correct"],  # Server-side only
             })
@@ -189,10 +200,12 @@ class AssessmentEngine:
     def _get_questions_from_bank(
         skills: list[str],
         difficulty: str,
-        num_questions: int
+        num_questions: int,
+        blocked_questions: set[str] | None = None,
     ) -> list[dict[str, Any]]:
         """Get questions from pre-built question bank."""
         questions = []
+        blocked = {question.strip().lower() for question in (blocked_questions or set())}
         
         for skill in skills:
             skill_normalized = skill.title()
@@ -200,11 +213,13 @@ class AssessmentEngine:
                 bank_by_difficulty = QUESTION_BANK[skill_normalized]
                 if difficulty in bank_by_difficulty:
                     bank_questions = bank_by_difficulty[difficulty]
-                    selected = random.sample(
-                        bank_questions,
-                        min(len(bank_questions), num_questions)
-                    )
-                    questions.extend(selected)
+                    candidates = [item for item in bank_questions if item["question"].strip().lower() not in blocked]
+                    random.shuffle(candidates)
+                    for item in candidates[:num_questions - len(questions)]:
+                        questions.append({**item, "skill": skill})
+                        blocked.add(item["question"].strip().lower())
+                    if len(questions) >= num_questions:
+                        break
         
         return questions
 
@@ -212,21 +227,28 @@ class AssessmentEngine:
     def _generate_with_ai(
         skills: list[str],
         difficulty: str,
-        num_questions: int
+        num_questions: int,
+        career: str = "",
     ) -> list[dict[str, Any]]:
         """Generate questions using AI."""
         questions = []
         
-        for skill in skills[:3]:  # Limit to first 3 skills
-            for _ in range(num_questions - len(questions)):
+        blocked = set()
+        for skill in skills[:5]:
+            attempts = max(2, (num_questions // max(len(skills[:5]), 1)) + 2)
+            for _ in range(attempts):
                 try:
-                    ai_question = ai_service.generate_mcq(skill, difficulty)
+                    ai_question = ai_service.generate_mcq(skill, difficulty, f"Target career: {career}. Only test this skill: {skill}.")
                     if "correct" not in ai_question and "correct_answer" in ai_question:
                         ai_question["correct"] = ai_question["correct_answer"]
                     question_text = ai_question.get("question", "").strip().lower()
-                    known_questions = {item.get("question", "").strip().lower() for item in questions}
-                    if question_text and question_text not in known_questions:
-                        questions.append(ai_question)
+                    is_duplicate = any(
+                        SequenceMatcher(None, question_text, existing).ratio() >= 0.84
+                        for existing in blocked
+                    )
+                    if question_text and not is_duplicate:
+                        questions.append({**ai_question, "skill": skill})
+                        blocked.add(question_text)
                 except Exception as e:
                     logger.warning(f"Error generating AI question: {e}")
                 if len(questions) >= num_questions:
@@ -235,6 +257,50 @@ class AssessmentEngine:
                 break
         
         return questions
+
+    @staticmethod
+    def _fallback_questions(skills: list[str], difficulty: str, count: int, blocked_questions: set[str]) -> list[dict[str, Any]]:
+        templates = {
+            "BEGINNER": [
+                ("Which statement best describes {skill}?", ["A foundational technology used for practical development", "A file format only", "A database table only", "A hardware component"], 0),
+                ("Which is a sensible first step when learning {skill}?", ["Learn its core concepts and syntax", "Skip documentation entirely", "Optimize before understanding it", "Avoid small practice exercises"], 0),
+                ("What is the best way to build a foundation in {skill}?", ["Combine documentation with small practical exercises", "Memorize unrelated syntax", "Avoid feedback", "Start with production-scale optimization"], 0),
+                ("A beginner using {skill} should primarily focus on:", ["Correct concepts and readable solutions", "Premature micro-optimization", "Ignoring errors", "Removing tests"], 0),
+            ],
+            "ADVANCED": [
+                ("Which approach is most appropriate when applying {skill} in a real project?", ["Choose the technique that fits the constraints and test it", "Use the most complex option by default", "Ignore failure cases", "Avoid measuring the result"], 0),
+                ("When debugging a {skill} implementation, what should you do first?", ["Reproduce and isolate the failing case", "Rewrite everything immediately", "Remove all validation", "Assume the input is always valid"], 0),
+                ("How should an engineer improve a {skill} solution that is correct but slow?", ["Profile it, identify the bottleneck, then compare targeted alternatives", "Change code randomly", "Remove all input checks", "Add complexity without measurement"], 0),
+                ("A robust {skill} implementation should be evaluated using:", ["Realistic cases, edge cases, and observable behavior", "Only the happy path", "Only source-code length", "No repeatable tests"], 0),
+            ],
+            "EXPERT": [
+                ("Which decision shows expert {skill} practice in production?", ["Evaluate trade-offs, failure modes, and operational cost", "Optimize one metric while ignoring reliability", "Hide edge cases from monitoring", "Choose architecture without constraints"], 0),
+                ("For a high-scale {skill} system, what should guide optimization?", ["Measured bottlenecks and explicit reliability requirements", "Assumptions without profiling", "Only code brevity", "Removing observability"], 0),
+                ("When designing a critical {skill} system, which trade-off must be explicit?", ["Consistency, latency, scalability, and failure recovery", "Color choices only", "Variable naming only", "Avoiding operational metrics"], 0),
+                ("What distinguishes expert reasoning about {skill} edge cases?", ["It anticipates invalid states and defines safe, observable behavior", "It assumes ideal inputs", "It removes safeguards", "It avoids testing failure modes"], 0),
+            ],
+        }
+        result = []
+        blocked = {question.strip().lower() for question in blocked_questions}
+        for skill in skills:
+            for template, options, correct in templates.get(difficulty, templates["BEGINNER"]):
+                question = template.format(skill=skill)
+                if question.lower() in blocked:
+                    continue
+                result.append({"question": question, "options": options, "correct": correct, "skill": skill})
+                blocked.add(question.lower())
+                if len(result) >= count:
+                    return result
+        for index in range(count - len(result)):
+            skill = skills[index % len(skills)] if skills else "your target skill"
+            question = f"Which practice most improves reliable {skill} work in scenario {index + 1}?"
+            result.append({
+                "question": question,
+                "options": ["Use a small reproducible example and verify the outcome", "Skip verification", "Ignore input behavior", "Avoid documentation"],
+                "correct": 0,
+                "skill": skill,
+            })
+        return result
 
     @staticmethod
     def _get_question_skill(question: dict[str, Any]) -> str:

@@ -50,7 +50,8 @@ async def generate_assessment(request: AssessmentRequest) -> dict[str, Any]:
         assessment = assessment_service.generate_assessment(
             skills,
             request.difficulty,
-            getattr(request, "user_id", None)
+            request.user_id,
+            request.career_id,
         )
         return assessment
     except Exception as error:
@@ -76,7 +77,7 @@ async def submit_assessment(
     """
     try:
         answers = [
-            (ans["question_id"], ans["answer"])
+            (ans.question_id, ans.answer)
             for ans in request.answers
         ]
 

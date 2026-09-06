@@ -7,14 +7,14 @@ import { useCareerLens } from '../context/CareerLensContext'
 export default function Dashboard() {
     const { analyticsOverview, careerMatches, skillGap } = useCareerLens()
     const metrics = analyticsOverview.main || {}
-    const readiness = metrics.career_readiness || 0
+    const readiness = metrics.career_readiness ?? metrics.career_readiness_score ?? 0
     const missingSkills = skillGap.missingSkills?.length || metrics.skill_gap_count || 0
     const priorityCount = skillGap.priorities?.find((group) => group.level?.toLowerCase() === 'high')?.skills?.length || 0
     const scoreCards = [
-        { title: 'Resume Score', value: metrics.resume_score || 0, icon: FileText, color: 'mint', trend: '+12%' },
-        { title: 'Skills Detected', value: metrics.skills_detected || 0, icon: Code2, color: 'blue', trend: '+3', suffix: '' },
-        { title: 'Career Matches', value: careerMatches?.length || 0, icon: Target, color: 'orange', trend: '+2', suffix: '' },
-        { title: 'Assessment Score', value: metrics.assessment_score || 0, icon: BarChart3, color: 'purple', trend: '+18%' },
+        { title: 'Resume Score', value: metrics.resume_score || 0, icon: FileText, color: 'mint' },
+        { title: 'Skills Detected', value: metrics.skills_detected || 0, icon: Code2, color: 'blue', suffix: '' },
+        { title: 'Career Matches', value: careerMatches?.filter((career) => career.score > 0).length || 0, icon: Target, color: 'orange', suffix: '' },
+        { title: 'Assessment Score', value: metrics.assessment_score || 0, icon: BarChart3, color: 'purple' },
     ]
     const quickActions = [
         { label: 'Upload Resume', detail: 'Get started with AI analysis', icon: Upload, path: '/upload-resume', color: 'blue' },
@@ -36,11 +36,11 @@ export default function Dashboard() {
                         <div className="dashboard-hero-art" aria-hidden="true"><div className="hero-document"><FileText size={62} /><CheckCircle2 className="hero-check" size={27} /></div><ArrowUpRight size={78} className="hero-arrow" /><span className="hero-tag hero-tag-grow">Grow</span><span className="hero-tag hero-tag-learn">Learn</span><span className="hero-star">✦</span></div>
                     </section>
 
-                    <div className="dashboard-stat-grid">{scoreCards.map((card) => <div key={card.title} className="dashboard-stat-card"><div className={`dashboard-stat-icon ${card.color}`}><card.icon size={22} /></div><div className="min-w-0"><p>{card.title}</p><div className="flex items-baseline gap-2"><strong>{card.value}{card.suffix ?? '%'}</strong><span>↑ {card.trend}</span></div><div className="dashboard-stat-line"><i className={card.color} style={{ width: `${Math.min(card.value, 100)}%` }} /></div></div></div>)}</div>
+                    <div className="dashboard-stat-grid">{scoreCards.map((card) => <div key={card.title} className="dashboard-stat-card"><div className={`dashboard-stat-icon ${card.color}`}><card.icon size={22} /></div><div className="min-w-0"><p>{card.title}</p><div className="flex items-baseline gap-2"><strong>{card.value}{card.suffix ?? '%'}</strong></div><div className="dashboard-stat-line"><i className={card.color} style={{ width: `${Math.min(card.value, 100)}%` }} /></div></div></div>)}</div>
 
                     <div className="dashboard-content-grid">
                         <section className="dashboard-panel readiness-panel"><h3>Your Career Readiness</h3><div className="readiness-content"><div className="readiness-ring" style={{ '--readiness': `${readiness * 3.6}deg` }}><div><strong>{readiness}%</strong><span>Good Preparation</span></div></div><div className="readiness-legend"><p><i className="legend-green" />Resume Analysis <b>{metrics.resume_score || 0}%</b></p><p><i className="legend-teal" />Skill Match <b>{metrics.career_match || 0}%</b></p><p><i className="legend-yellow" />Assessment <b>{metrics.assessment_score || 0}%</b></p><p><i className="legend-blue" />Confidence <b>{metrics.confidence_score || 0}%</b></p></div></div></section>
-                        <section className="dashboard-panel careers-panel"><div className="dashboard-panel-heading"><h3>Top Career Matches</h3><Link to="/career-suggestions">View All <ArrowRight size={14} /></Link></div>{(careerMatches || []).slice(0, 4).map((career, index) => <Link to={`/career/${career.id}`} className="career-match-row" key={career.id}><span className={`career-rank rank-${index + 1}`}>{index + 1}</span><strong>{career.title}</strong><span className="career-match-bar"><i style={{ width: `${career.score}%` }} /></span><b>{career.score}%</b></Link>)}</section>
+                        <section className="dashboard-panel careers-panel"><div className="dashboard-panel-heading"><h3>Top Career Matches</h3><Link to="/career-suggestions">View All <ArrowRight size={14} /></Link></div>{(careerMatches || []).filter((career) => career.score > 0).slice(0, 4).map((career, index) => <Link to={`/career/${career.id}`} className="career-match-row" key={career.id}><span className={`career-rank rank-${index + 1}`}>{index + 1}</span><strong>{career.title}</strong><span className="career-match-bar"><i style={{ width: `${career.score}%` }} /></span><b>{career.score}%</b></Link>)}{!(careerMatches || []).some((career) => career.score > 0) && <p className="text-sm text-secondary">Upload a resume to calculate your best career matches.</p>}</section>
                         <section className="dashboard-panel gap-panel"><h3>Skill Gap Overview</h3><div className="gap-ring" style={{ '--gap-angle': `${Math.min(missingSkills, 10) * 36}deg` }}><div><strong>{missingSkills}</strong><span>Missing Skills</span></div></div><div className="gap-legend"><p><i className="legend-red" />High Priority <b>{priorityCount}</b></p><p><i className="legend-yellow" />Medium Priority <b>{Math.max(missingSkills - priorityCount, 0)}</b></p><p><i className="legend-blue" />Low Priority <b>0</b></p></div></section>
                     </div>
 

@@ -1,3 +1,5 @@
+import { useEffect, useState } from 'react'
+import { useNavigate, useParams } from 'react-router-dom'
 import { useCareerLens } from '../context/CareerLensContext'
 import DashboardLayout from '../layouts/DashboardLayout'
 import PageTransition from '../components/PageTransition'
@@ -5,9 +7,21 @@ import { CheckCircle2, BarChart3, Star } from 'lucide-react'
 import ProgressBar from '../components/ProgressBar'
 
 export default function AssessmentResults() {
-  const { assessmentResult, resumeState } = useCareerLens()
+  const { assessmentResult, resumeState, loadAssessmentResult } = useCareerLens()
+  const { assessmentId } = useParams()
+  const navigate = useNavigate()
+  const [loading, setLoading] = useState(Boolean(assessmentId))
+  const [error, setError] = useState('')
+  useEffect(() => {
+    if (!assessmentId) return undefined
+    loadAssessmentResult(assessmentId).catch((requestError) => setError(requestError.message)).finally(() => setLoading(false))
+    return undefined
+  }, [assessmentId, loadAssessmentResult])
 
-  if (!resumeState.uploaded) {
+  if (loading) return <PageTransition><DashboardLayout title="Assessment Results"><div className="glass-card p-10 text-center text-secondary">Loading your saved result...</div></DashboardLayout></PageTransition>
+  if (error) return <PageTransition><DashboardLayout title="Assessment Results"><div className="glass-card mx-auto max-w-2xl p-10 text-center"><h2 className="text-2xl font-semibold text-primary">Result unavailable</h2><p className="mt-3 text-secondary">{error}</p><button onClick={() => navigate('/assessment')} className="mt-6 rounded-xl bg-primary px-5 py-3 font-semibold text-white">Back to assessment</button></div></DashboardLayout></PageTransition>
+
+  if (!resumeState.uploaded || !assessmentResult) {
     return (
       <PageTransition>
         <DashboardLayout title="Assessment Results">

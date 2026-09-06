@@ -183,6 +183,7 @@ class AssessmentRequest(BaseModel):
     resume_id: str
     career_id: str
     difficulty: str = Field(pattern="^(BEGINNER|ADVANCED|EXPERT)$")
+    user_id: Optional[str] = None
 
 
 class AssessmentQuestion(BaseModel):

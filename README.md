@@ -219,6 +219,24 @@ CareerLens AI transforms traditional resume analysis into an intelligent career 
 
 ## Local Development
 
+### Supabase Authentication and Storage
+
+The frontend can use Supabase for account authentication, profile onboarding, and private resume storage. The existing FastAPI service still performs resume parsing and AI analysis.
+
+1. Create a Supabase project.
+2. Open Supabase SQL Editor and run [supabase/schema.sql](supabase/schema.sql).
+3. Copy `frontend/.env.example` to `frontend/.env` and fill in:
+
+```env
+VITE_SUPABASE_URL=https://your-project.supabase.co
+VITE_SUPABASE_ANON_KEY=your-anon-key
+```
+
+4. In Supabase Authentication settings, choose whether new users must confirm their email. If confirmation is enabled, users confirm first and then sign in.
+5. Start the app. New users follow: sign up -> profile setup -> resume upload -> existing AI analysis -> dashboard insights.
+
+Resume files are stored privately in the `resumes` bucket under a user-specific folder. The browser also sends the selected file to the existing FastAPI upload endpoint so current analysis features continue to work.
+
 Install backend dependencies and start the API:
 
 ```powershell

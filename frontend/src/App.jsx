@@ -20,8 +20,9 @@ import Confidence from './pages/Confidence'
 import ClaimComparisonPage from './pages/ClaimComparisonPage'
 import CareerReadiness from './pages/CareerReadiness'
 import Analytics from './pages/ResultsAnalytics'
-import Settings from './pages/Settings'
 import Profile from './pages/Profile'
+import ProfileSetup from './pages/ProfileSetup'
+import ProtectedRoute from './components/ProtectedRoute'
 
 function App() {
   return (
@@ -30,6 +31,8 @@ function App() {
         <Route path="/"                   element={<LandingPage />} />
       <Route path="/login"              element={<LoginPage />} />
       <Route path="/signup"             element={<SignupPage />} />
+      <Route element={<ProtectedRoute />}>
+        <Route path="/profile-setup" element={<ProfileSetup />} />
         <Route element={<DashboardLayout />}>
         <Route path="/dashboard"          element={<Dashboard />} />
         <Route path="/upload-resume"      element={<ResumeUpload />} />
@@ -44,12 +47,13 @@ function App() {
         <Route path="/assessment"         element={<Assessment />} />
         <Route path="/assessment/:level"  element={<AssessmentLevel />} />
         <Route path="/assessment/results" element={<AssessmentResults />} />
+        <Route path="/assessment/results/:assessmentId" element={<AssessmentResults />} />
         <Route path="/confidence"         element={<Confidence />} />
         <Route path="/claim-vs-actual"    element={<ClaimComparisonPage />} />
         <Route path="/career-readiness"   element={<CareerReadiness />} />
         <Route path="/analytics"          element={<Analytics />} />
-        <Route path="/settings"           element={<Settings />} />
         <Route path="/profile"            element={<Profile />} />
+        </Route>
         </Route>
       </Routes>
       <HelpChatbot />

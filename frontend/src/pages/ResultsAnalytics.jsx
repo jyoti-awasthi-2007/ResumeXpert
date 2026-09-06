@@ -1,31 +1,27 @@
 import { motion } from 'framer-motion'
 import { Radar, RadarChart, PolarGrid, PolarAngleAxis, PolarRadiusAxis, ResponsiveContainer, BarChart, Bar, XAxis, YAxis, CartesianGrid, Tooltip } from 'recharts'
-import { TrendingUp, Award, Target, Zap } from 'lucide-react'
+import { TrendingUp, Award, Target, Zap, FileText, Sparkles } from 'lucide-react'
 import DashboardLayout from '../layouts/DashboardLayout'
-import ProgressBar from '../components/ProgressBar'
 import PageTransition from '../components/PageTransition'
-import { useState, useEffect } from 'react'
-
-const radarData = [
-    { skill: 'React', value: 92 },
-    { skill: 'Node.js', value: 85 },
-    { skill: 'Python', value: 78 },
-    { skill: 'AWS', value: 70 },
-    { skill: 'System Design', value: 65 },
-    { skill: 'DSA', value: 80 },
-]
-
-const barData = [
-    { name: 'Resume', score: 90 },
-    { name: 'Skill Match', score: 85 },
-    { name: 'Assessment', score: 78 },
-    { name: 'Skill Test', score: 92 },
-    { name: 'Readiness', score: 95 },
-]
+import { useCareerLens } from '../context/CareerLensContext'
+import { useEffect, useState } from 'react'
 
 export default function ResultsAnalytics() {
+    const { analyticsOverview, skills, resumeState } = useCareerLens()
+    const metrics = analyticsOverview.main || {}
     const [trustScore, setTrustScore] = useState(0)
-    const targetScore = 87
+    const targetScore = metrics.career_readiness || 0
+    const radarData = skills.slice(0, 6).map((skill) => ({
+        skill: typeof skill === 'string' ? skill : skill.name,
+        value: Number(typeof skill === 'string' ? 70 : skill.confidence || 70),
+    })).filter((item) => item.skill)
+    const summaryData = [
+        { label: 'Resume Score', value: metrics.resume_score, color: '#0b83c9', icon: FileText },
+        { label: 'Skill Match', value: metrics.career_match, color: '#16b8c5', icon: Sparkles },
+        { label: 'Assessment', value: metrics.assessment_score, color: '#f19a32', icon: Zap },
+        { label: 'Confidence', value: metrics.confidence_score, color: '#19a979', icon: Award },
+    ]
+    const barData = summaryData.map(({ label, value }) => ({ name: label.replace(' Score', ''), score: value || 0 }))
 
     useEffect(() => {
         const duration = 2000
@@ -43,18 +39,20 @@ export default function ResultsAnalytics() {
     return (
         <PageTransition>
             <DashboardLayout title="Results & Analytics">
-                <div className="max-w-6xl mx-auto">
-                    <div className="grid lg:grid-cols-3 gap-6 mb-6">
+                <div className="analytics-page mx-auto max-w-7xl">
+                    <div className="analytics-intro"><div><p className="analytics-kicker">Your progress, clearly mapped</p><h2>Results & Analytics</h2><p>See how your resume, skills, assessment, and career fit are moving together.</p></div><div className="analytics-intro-badge"><TrendingUp size={18} /><span>{resumeState.uploaded ? 'Live from your resume' : 'Waiting for your resume'}</span></div></div>
+                    {!resumeState.uploaded && <div className="analytics-empty"><FileText size={22} /><span>Upload a resume to replace demo values with your personal results.</span></div>}
+                    <div className="grid gap-5 xl:grid-cols-[1fr_1fr_1.15fr] mb-5">
                         {/* Large Circular Score */}
                         <motion.div
                             initial={{ opacity: 0, y: 20 }}
                             animate={{ opacity: 1, y: 0 }}
-                            className="glass-card p-8 flex flex-col items-center justify-center"
+                            className="analytics-card flex flex-col items-center justify-center p-6 sm:p-8"
                         >
-                            <h3 className="text-sm text-white/50 mb-4 font-medium">Skill Trust Score</h3>
+                            <h3 className="analytics-card-label">Career readiness</h3>
                             <div className="relative w-44 h-44">
                                 <svg className="w-full h-full -rotate-90" viewBox="0 0 180 180">
-                                    <circle cx="90" cy="90" r="76" fill="none" stroke="rgba(255,255,255,0.05)" strokeWidth="10" />
+                                    <circle cx="90" cy="90" r="76" fill="none" stroke="#e6f0f4" strokeWidth="10" />
                                     <motion.circle
                                         cx="90" cy="90" r="76" fill="none"
                                         stroke="url(#trustGrad)"
@@ -64,19 +62,19 @@ export default function ResultsAnalytics() {
                                     />
                                     <defs>
                                         <linearGradient id="trustGrad" x1="0" y1="0" x2="1" y2="1">
-                                            <stop offset="0%" stopColor="#6C5CE7" />
-                                            <stop offset="100%" stopColor="#00D4FF" />
+                                            <stop offset="0%" stopColor="#0878c9" />
+                                            <stop offset="100%" stopColor="#16c7d8" />
                                         </linearGradient>
                                     </defs>
                                 </svg>
                                 <div className="absolute inset-0 flex flex-col items-center justify-center">
-                                    <motion.span className="text-4xl font-bold gradient-text">{trustScore}</motion.span>
-                                    <span className="text-sm text-white/30">out of 100</span>
+                                    <motion.span className="text-4xl font-bold text-primary">{trustScore}</motion.span>
+                                    <span className="text-sm text-secondary">out of 100</span>
                                 </div>
                             </div>
-                            <div className="mt-4 flex items-center gap-2 text-sm">
-                                <TrendingUp size={16} className="text-green-400" />
-                                <span className="text-green-400">+5 from last assessment</span>
+                            <div className="mt-4 flex items-center gap-2 text-sm text-success">
+                                <TrendingUp size={16} />
+                                <span>{resumeState.uploaded ? 'Calculated from your current results' : 'Complete your profile to begin'}</span>
                             </div>
                         </motion.div>
 
@@ -85,21 +83,10 @@ export default function ResultsAnalytics() {
                             initial={{ opacity: 0, y: 20 }}
                             animate={{ opacity: 1, y: 0 }}
                             transition={{ delay: 0.1 }}
-                            className="glass-card p-8 space-y-6"
+                            className="analytics-card p-6 sm:p-8"
                         >
-                            <h3 className="text-sm text-white/50 font-medium">Performance Summary</h3>
-                            {[
-                                { label: 'Resume Score', value: 90, color: 'primary', icon: Target },
-                                { label: 'Assessment Score', value: 78, color: 'accent', icon: Zap },
-                                { label: 'Test Score', value: 92, color: 'success', icon: Award },
-                            ].map((item, i) => (
-                                <div key={item.label}>
-                                    <div className="flex items-center gap-2 mb-2">
-                                        <item.icon size={14} className="text-white/40" />
-                                        <ProgressBar label={item.label} value={item.value} color={item.color} delay={0.3 + i * 0.2} />
-                                    </div>
-                                </div>
-                            ))}
+                            <h3 className="analytics-card-label mb-6">Performance summary</h3>
+                            <div className="space-y-5">{summaryData.map((item) => <div key={item.label}><div className="mb-2 flex items-center justify-between gap-3 text-sm"><span className="flex items-center gap-2 text-secondary"><item.icon size={15} style={{ color: item.color }} />{item.label}</span><strong className="text-primary">{item.value || 0}%</strong></div><div className="analytics-progress"><i style={{ width: `${Math.min(item.value || 0, 100)}%`, background: item.color }} /></div></div>)}</div>
                         </motion.div>
 
                         {/* Radar Chart */}
@@ -107,17 +94,17 @@ export default function ResultsAnalytics() {
                             initial={{ opacity: 0, y: 20 }}
                             animate={{ opacity: 1, y: 0 }}
                             transition={{ delay: 0.2 }}
-                            className="glass-card p-6"
+                            className="analytics-card p-5 sm:p-6"
                         >
-                            <h3 className="text-sm text-white/50 font-medium mb-4">Skill Radar</h3>
-                            <ResponsiveContainer width="100%" height={240}>
-                                <RadarChart data={radarData}>
-                                    <PolarGrid stroke="rgba(255,255,255,0.08)" />
-                                    <PolarAngleAxis dataKey="skill" tick={{ fill: 'rgba(255,255,255,0.5)', fontSize: 11 }} />
+                            <h3 className="analytics-card-label mb-2">Skill radar</h3>
+                            {radarData.length ? <ResponsiveContainer width="100%" height={245}>
+                                <RadarChart data={radarData} outerRadius="72%">
+                                    <PolarGrid stroke="#dbeaf0" />
+                                    <PolarAngleAxis dataKey="skill" tick={{ fill: '#668096', fontSize: 11 }} />
                                     <PolarRadiusAxis tick={false} axisLine={false} />
-                                    <Radar dataKey="value" stroke="#6C5CE7" fill="#6C5CE7" fillOpacity={0.2} strokeWidth={2} />
+                                    <Radar dataKey="value" stroke="#0878c9" fill="#16c7d8" fillOpacity={0.24} strokeWidth={2} />
                                 </RadarChart>
-                            </ResponsiveContainer>
+                            </ResponsiveContainer> : <div className="analytics-chart-empty"><Target size={26} /><span>Your extracted skills will appear here.</span></div>}
                         </motion.div>
                     </div>
 
@@ -126,21 +113,21 @@ export default function ResultsAnalytics() {
                         initial={{ opacity: 0, y: 20 }}
                         animate={{ opacity: 1, y: 0 }}
                         transition={{ delay: 0.3 }}
-                        className="glass-card p-6"
+                        className="analytics-card p-5 sm:p-6"
                     >
-                        <h3 className="text-lg font-semibold text-white mb-4">Performance Breakdown</h3>
+                        <h3 className="analytics-card-title">Performance breakdown</h3>
                         <ResponsiveContainer width="100%" height={300}>
                             <BarChart data={barData} barSize={40}>
-                                <CartesianGrid strokeDasharray="3 3" stroke="rgba(255,255,255,0.05)" />
-                                <XAxis dataKey="name" stroke="rgba(255,255,255,0.3)" fontSize={12} />
-                                <YAxis stroke="rgba(255,255,255,0.3)" fontSize={12} />
+                                <CartesianGrid strokeDasharray="3 3" stroke="#e5eff3" />
+                                <XAxis dataKey="name" stroke="#668096" fontSize={12} />
+                                <YAxis stroke="#668096" fontSize={12} domain={[0, 100]} />
                                 <Tooltip
-                                    contentStyle={{ background: 'rgba(15,23,42,0.9)', border: '1px solid rgba(255,255,255,0.1)', borderRadius: '12px', color: '#fff' }}
+                                    contentStyle={{ background: '#102a43', border: 0, borderRadius: '10px', color: '#fff' }}
                                 />
                                 <defs>
                                     <linearGradient id="barGrad" x1="0" y1="0" x2="0" y2="1">
-                                        <stop offset="0%" stopColor="#6C5CE7" />
-                                        <stop offset="100%" stopColor="#00D4FF" />
+                                        <stop offset="0%" stopColor="#0878c9" />
+                                        <stop offset="100%" stopColor="#16c7d8" />
                                     </linearGradient>
                                 </defs>
                                 <Bar dataKey="score" fill="url(#barGrad)" radius={[8, 8, 0, 0]} />

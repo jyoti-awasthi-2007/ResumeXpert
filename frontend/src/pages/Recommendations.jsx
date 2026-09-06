@@ -1,5 +1,7 @@
+import { useState } from 'react'
 import { useNavigate } from 'react-router-dom'
 import { useCareerLens } from '../context/CareerLensContext'
+import { useAuth } from '../context/AuthContext'
 import DashboardLayout from '../layouts/DashboardLayout'
 import PageTransition from '../components/PageTransition'
 import RecommendationCard from '../components/RecommendationCard'
@@ -8,6 +10,8 @@ import { Lightbulb, ArrowRight } from 'lucide-react'
 export default function Recommendations() {
   const navigate = useNavigate()
   const { recommendations, resumeState } = useCareerLens()
+  const { logActivity } = useAuth()
+  const [learningSkills, setLearningSkills] = useState([])
 
   if (!resumeState.uploaded) {
     return (
@@ -30,7 +34,8 @@ export default function Recommendations() {
   }
 
   const handleMark = (skill) => {
-    alert(`Marked ${skill} as learning.`)
+    setLearningSkills((current) => current.includes(skill) ? current : [...current, skill])
+    logActivity('skill_learning_started', { skill }).catch(() => {})
   }
 
   return (
@@ -47,9 +52,9 @@ export default function Recommendations() {
             </div>
           </div>
           <div className="grid gap-6 lg:grid-cols-3">
-            {recommendations.map((item) => (
-              <RecommendationCard key={item.skill} item={item} onMark={handleMark} />
-            ))}
+            {recommendations.length ? recommendations.map((item) => (
+              <RecommendationCard key={item.skill} item={{ ...item, learning: learningSkills.includes(item.skill) }} onMark={handleMark} />
+            )) : <div className="col-span-full rounded-2xl border border-dashed border-border-strong p-8 text-center text-sm text-secondary">No learning recommendations are available yet. Analyze your resume and choose a career to generate them.</div>}
           </div>
         </div>
       </DashboardLayout>

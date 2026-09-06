@@ -1,8 +1,11 @@
 """Assessment service for quiz operations."""
 import logging
+import json
+from pathlib import Path
 from typing import Any
 
 from app.engines import AssessmentEngine
+from app.config import settings
 
 logger = logging.getLogger(__name__)
 
@@ -13,13 +16,24 @@ class AssessmentService:
     def __init__(self):
         """Initialize assessment service."""
         self.engine = AssessmentEngine()
-        self.assessments = {}  # assessment_id -> assessment_data
+        self.store_path = settings.UPLOAD_DIR / "assessments.json"
+        self.store_path.parent.mkdir(parents=True, exist_ok=True)
+        try:
+            self.assessments = json.loads(self.store_path.read_text(encoding="utf-8")) if self.store_path.exists() else {}
+        except (OSError, json.JSONDecodeError):
+            logger.warning("Assessment store could not be loaded; starting with an empty store.")
+            self.assessments = {}
+
+    def _save(self) -> None:
+        """Persist assessment sessions and results without exposing answers to clients."""
+        self.store_path.write_text(json.dumps(self.assessments), encoding="utf-8")
 
     def generate_assessment(
         self,
         skills: list[str],
         difficulty: str,
-        user_id: str | None = None
+        user_id: str | None = None,
+        career: str = ""
     ) -> dict[str, Any]:
         """
         Generate a new assessment.
@@ -35,7 +49,7 @@ class AssessmentService:
         import secrets
         
         # Generate questions (with correct answers for server-side)
-        questions = self.engine.generate_assessment(skills, difficulty, num_questions=10)
+        questions = self.engine.generate_assessment(skills, difficulty, num_questions=10, career=career)
         
         # Create assessment ID
         assessment_id = secrets.token_urlsafe(12)
@@ -50,6 +64,7 @@ class AssessmentService:
             "status": "generated",
             "result": None,
         }
+        self._save()
         
         logger.info(f"Assessment {assessment_id} generated for skills: {skills}")
         
@@ -91,6 +106,8 @@ class AssessmentService:
             raise ValueError(f"Assessment {assessment_id} not found")
         
         assessment = self.assessments[assessment_id]
+        if assessment["status"] == "completed" and assessment["result"]:
+            return {"assessment_id": assessment_id, **assessment["result"]}
         questions = assessment["questions"]
         
         # Score the assessment
@@ -99,6 +116,7 @@ class AssessmentService:
         # Store result
         self.assessments[assessment_id]["result"] = result
         self.assessments[assessment_id]["status"] = "completed"
+        self._save()
         
         logger.info(f"Assessment {assessment_id} scored: {result['score']}")
         

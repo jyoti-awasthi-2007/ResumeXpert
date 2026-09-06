@@ -21,7 +21,7 @@ export default function RecommendationCard({ item, onMark }) {
         onClick={() => onMark(item.skill)}
         className="inline-flex items-center gap-2 px-4 py-2 rounded-full bg-linear-to-r from-primary to-purple-500 text-white text-sm font-semibold hover:brightness-110 transition"
       >
-        Mark as Learning
+        {item.learning ? 'Learning started' : 'Start learning'}
         <ArrowRight size={16} />
       </button>
     </motion.div>

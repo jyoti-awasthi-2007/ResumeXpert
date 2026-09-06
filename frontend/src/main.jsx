@@ -4,13 +4,16 @@ import { BrowserRouter } from 'react-router-dom'
 import './index.css'
 import App from './App.jsx'
 import { CareerLensProvider } from './context/CareerLensContext.jsx'
+import { AuthProvider } from './context/AuthContext.jsx'
 
 createRoot(document.getElementById('root')).render(
   <StrictMode>
     <BrowserRouter>
-      <CareerLensProvider>
-        <App />
-      </CareerLensProvider>
+      <AuthProvider>
+        <CareerLensProvider>
+          <App />
+        </CareerLensProvider>
+      </AuthProvider>
     </BrowserRouter>
   </StrictMode>,
 )
