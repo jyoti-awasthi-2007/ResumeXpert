@@ -12,12 +12,10 @@ class Settings(BaseSettings):
     APP_NAME: str = "CareerLens AI API"
     APP_VERSION: str = "1.0.0"
     DEBUG: bool = os.getenv("DEBUG", "false").lower() == "true"
+    APP_ENV: str = os.getenv("APP_ENV", "development")
 
     # Database
-    DATABASE_URL: str = os.getenv(
-        "DATABASE_URL",
-        f"sqlite:///{Path(__file__).resolve().parents[1] / 'careerlens.db'}"
-    )
+    DATABASE_URL: str | None = os.getenv("DATABASE_URL")
 
     # File uploads
     UPLOAD_DIR: Path = Path(os.getenv(
@@ -49,6 +47,7 @@ class Settings(BaseSettings):
     class Config:
         env_file = str(Path(__file__).resolve().parents[1] / ".env")
         case_sensitive = True
+        extra = "ignore"
 
 
 settings = Settings()

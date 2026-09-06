@@ -277,6 +277,23 @@ FRONTEND_URL=https://<your-vercel-domain>
 DATABASE_URL=<persistent database URL>
 ```
 
+For Supabase PostgreSQL, open **Supabase Dashboard → Project Settings → Database → Connection string** and choose the **Session pooler** connection for a hosted Render service. Use the password from the database password/reset flow, URL-encode special password characters, and set the result as:
+
+```text
+DATABASE_URL=postgresql+psycopg://postgres.<project-ref>:<password>@<pooler-host>:5432/postgres
+```
+
+Do not commit this value or paste it into frontend environment variables. Before the first Render deploy, run the migration locally with the same URL in a temporary shell environment:
+
+```powershell
+cd backend
+$env:APP_ENV="production"
+$env:DATABASE_URL="postgresql+psycopg://postgres.<project-ref>:<password>@<pooler-host>:5432/postgres"
+alembic upgrade head
+```
+
+The migration creates only backend-owned tables. It does not drop or modify `profiles`, `activity_logs`, `auth.users`, or Supabase Storage tables. The current local `backend/careerlens.db` has no rows in the core backend tables, so no SQLite data was copied into production.
+
 Keep `AI_API_KEY` on Render only. Do not put it in Vercel or frontend code. Render free web services sleep when idle; use an always-on plan if continuous availability is required. A persistent database is recommended because local SQLite and `/tmp` files are not durable across redeploys.
 
 ### Frontend on Vercel
@@ -292,3 +309,7 @@ VITE_SUPABASE_ANON_KEY=<your-supabase-anon-key>
 `frontend/vercel.json` handles React Router refreshes for routes such as `/profile`, `/assessment`, and `/analytics`.
 
 Deploy Render first, copy its URL into `VITE_API_BASE_URL`, then deploy or redeploy Vercel. Verify `https://<your-render-service>.onrender.com/api/health` returns `{"status":"ok"}`.
+
+### Remaining production work
+
+The schema migration is ready, but the current API still has non-database runtime state: resume metadata/analysis is held in `ResumeService.resume_store`, assessment sessions/results are stored in a backend JSON file, and `backend/uploads` is local filesystem storage. Render storage is ephemeral. Resume upload should continue using Supabase Storage, and resume/assessment records should be wired to the PostgreSQL tables before relying on them across restarts. The current resume route also uses `default_user`; authenticated Supabase user identity is not yet passed through every backend route.

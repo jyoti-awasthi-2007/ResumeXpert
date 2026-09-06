@@ -10,6 +10,8 @@ services:
     envVars:
       - key: PYTHON_VERSION
         value: 3.12.8
+      - key: APP_ENV
+        value: production
       - key: AI_PROVIDER
         sync: false
       - key: AI_API_KEY

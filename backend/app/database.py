@@ -1,11 +1,25 @@
-import os
 from pathlib import Path
 
 from sqlalchemy import create_engine
 from sqlalchemy.orm import DeclarativeBase, sessionmaker
+from .config import settings
 
 BASE_DIR = Path(__file__).resolve().parents[1]
-DATABASE_URL = os.getenv("DATABASE_URL", f"sqlite:///{BASE_DIR / 'careerlens.db'}")
+if not settings.DATABASE_URL:
+    if settings.APP_ENV.lower() in {"production", "prod"}:
+        raise RuntimeError("DATABASE_URL is required in production. Configure a PostgreSQL URL.")
+    DATABASE_URL = f"sqlite:///{BASE_DIR / 'careerlens.db'}"
+else:
+    DATABASE_URL = settings.DATABASE_URL
+
+if settings.APP_ENV.lower() in {"production", "prod"} and DATABASE_URL.startswith("sqlite"):
+    raise RuntimeError("SQLite is not supported in production. Set DATABASE_URL to Supabase PostgreSQL.")
+
+if DATABASE_URL.startswith("postgres://"):
+    DATABASE_URL = "postgresql+psycopg://" + DATABASE_URL.removeprefix("postgres://")
+elif DATABASE_URL.startswith("postgresql://"):
+    DATABASE_URL = "postgresql+psycopg://" + DATABASE_URL.removeprefix("postgresql://")
+
 connect_args = {"check_same_thread": False} if DATABASE_URL.startswith("sqlite") else {}
 engine = create_engine(DATABASE_URL, connect_args=connect_args, pool_pre_ping=True)
 SessionLocal = sessionmaker(bind=engine, autoflush=False, autocommit=False)
