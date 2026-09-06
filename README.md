@@ -259,3 +259,36 @@ npm run dev
 The API is available at `http://localhost:8000`, Swagger at `http://localhost:8000/docs`, and the frontend at `http://localhost:5173`. Copy `backend/.env.example` to `backend/.env` and `frontend/.env.example` to `frontend/.env` when changing local URLs.
 
 Run backend tests with `cd backend; pytest`. The main flow is upload (`POST /api/resumes/upload`), analyze (`POST /api/resumes/{resume_id}/analyze`), recommend (`POST /api/careers/recommend`), skill gap (`POST /api/skill-gap/analyze`), recommendations (`POST /api/recommendations/skills`), assessment generation/submission, confidence, claim comparison, readiness, and analytics. Assessment generation deliberately omits the server-side answer key.
+
+## Production Deployment
+
+### Backend on Render
+
+The repository includes `render.yaml`. In Render, choose **New > Blueprint** and select this repository. It creates the `resumexpert-api` web service with the correct Python build command, `$PORT` binding, and `/api/health` health check.
+
+Set these Render environment variables:
+
+```text
+AI_PROVIDER=groq
+AI_API_KEY=<new server-side Groq key>
+AI_BASE_URL=https://api.groq.com/openai/v1
+AI_MODEL=<your Groq model>
+FRONTEND_URL=https://<your-vercel-domain>
+DATABASE_URL=<persistent database URL>
+```
+
+Keep `AI_API_KEY` on Render only. Do not put it in Vercel or frontend code. Render free web services sleep when idle; use an always-on plan if continuous availability is required. A persistent database is recommended because local SQLite and `/tmp` files are not durable across redeploys.
+
+### Frontend on Vercel
+
+Create a Vercel project with `frontend` as the **Root Directory**. Set:
+
+```text
+VITE_API_BASE_URL=https://<your-render-service>.onrender.com/api
+VITE_SUPABASE_URL=https://<your-project>.supabase.co
+VITE_SUPABASE_ANON_KEY=<your-supabase-anon-key>
+```
+
+`frontend/vercel.json` handles React Router refreshes for routes such as `/profile`, `/assessment`, and `/analytics`.
+
+Deploy Render first, copy its URL into `VITE_API_BASE_URL`, then deploy or redeploy Vercel. Verify `https://<your-render-service>.onrender.com/api/health` returns `{"status":"ok"}`.
