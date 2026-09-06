@@ -28,7 +28,11 @@ app.add_middleware(
         origin.strip()
         for origin in settings.FRONTEND_URL.split(',')
         if origin.strip()
-    } | {"http://localhost:5173", "http://127.0.0.1:5173"}),
+    } | {
+        "http://localhost:5173",
+        "http://127.0.0.1:5173",
+        "https://resume-xpert-7fdxq4b1r-jyoti-works.vercel.app",
+    }),
     allow_credentials=True,
     allow_methods=["*"],
     allow_headers=["*"],
