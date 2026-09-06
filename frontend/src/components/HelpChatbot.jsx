@@ -95,7 +95,7 @@ export default function HelpChatbot() {
       const response = await api.post('/chat', { message: text })
       setMessages((current) => [...current, { role: 'assistant', text: response.data.message }])
     } catch {
-      setMessages((current) => [...current, { role: 'assistant', text: 'I could not connect right now. Please check that the backend is running on port 8000.' }])
+      setMessages((current) => [...current, { role: 'assistant', text: 'I could not connect right now. Please try again in a moment.' }])
     } finally {
       setSending(false)
     }
