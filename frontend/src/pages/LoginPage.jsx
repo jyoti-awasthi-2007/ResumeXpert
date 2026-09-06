@@ -1,7 +1,6 @@
 import { useState } from 'react'
 import { Link, useNavigate } from 'react-router-dom'
-import { motion } from 'framer-motion'
-import { Mail, Lock, Eye, EyeOff } from 'lucide-react'
+import { Mail, Lock, Eye, EyeOff, ArrowRight, ShieldCheck, Sparkles } from 'lucide-react'
 import GradientBackground from '../components/GradientBackground'
 import AnimatedButton from '../components/AnimatedButton'
 import PageTransition from '../components/PageTransition'
@@ -22,22 +21,26 @@ export default function LoginPage() {
     return (
         <PageTransition>
             <GradientBackground variant="auth">
-                <div className="min-h-screen flex items-center justify-center px-4">
-                    <motion.div
+                <div className="auth-page min-h-screen flex items-center justify-center px-4 py-8">
+                    <div
                         initial={{ opacity: 0, y: 30, scale: 0.95 }}
                         animate={{ opacity: 1, y: 0, scale: 1 }}
                         transition={{ duration: 0.7 }}
-                        className="w-full max-w-md"
+                        className="auth-frame w-full max-w-5xl"
                     >
-                        <div className="text-center mb-8">
-                            <Link to="/" className="inline-flex mb-6">
-                                <BrandLockup />
-                            </Link>
-                            <h1 className="text-3xl font-bold text-white mb-2">Welcome back</h1>
-                            <p className="text-white/40">Sign in to your account</p>
+                        <div className="auth-showcase">
+                            <Link to="/" className="auth-brand"><BrandLockup /></Link>
+                            <div className="auth-showcase-copy">
+                                <span className="auth-kicker"><Sparkles size={15} /> AI-powered career clarity</span>
+                                <h1>Turn your experience into your <em>next opportunity.</em></h1>
+                                <p>Analyze your resume, discover your strongest skills, and build a career path that feels made for you.</p>
+                            </div>
+                            <div className="auth-proof"><span className="auth-proof-icon"><ShieldCheck size={20} /></span><span><strong>Trusted career insights</strong><small>One focused workspace for your next move</small></span></div>
+                            <div className="auth-orbit auth-orbit-one" /><div className="auth-orbit auth-orbit-two" /><div className="auth-showcase-dots">✦<br /><span>+</span> ✦</div>
                         </div>
 
-                        <div className="glass-card-strong p-8">
+                        <div className="auth-form-panel">
+                            <div className="auth-form-heading"><span className="auth-mobile-brand"><Link to="/"><BrandLockup compact /></Link></span><p className="auth-form-kicker">Welcome back</p><h2>Sign in to your account</h2><p>Pick up where you left off.</p></div>
                             <form onSubmit={handleSubmit} className="space-y-5">
                                 {/* Email */}
                                 <div className="relative">
@@ -49,7 +52,7 @@ export default function LoginPage() {
                                         onFocus={() => setFocused('email')}
                                         onBlur={() => setFocused('')}
                                         placeholder="Email address"
-                                        className="w-full pl-12 pr-4 py-3.5 bg-white/5 border border-white/10 rounded-xl text-white placeholder-white/30 focus:outline-none focus:border-primary/50 focus:bg-white/[0.07] transition-all"
+                                        className="auth-input w-full pl-12 pr-4 py-3.5"
                                     />
                                 </div>
 
@@ -63,7 +66,7 @@ export default function LoginPage() {
                                         onFocus={() => setFocused('password')}
                                         onBlur={() => setFocused('')}
                                         placeholder="Password"
-                                        className="w-full pl-12 pr-12 py-3.5 bg-white/5 border border-white/10 rounded-xl text-white placeholder-white/30 focus:outline-none focus:border-primary/50 focus:bg-white/[0.07] transition-all"
+                                        className="auth-input w-full pl-12 pr-12 py-3.5"
                                     />
                                     <button
                                         type="button"
@@ -75,28 +78,28 @@ export default function LoginPage() {
                                 </div>
 
                                 <div className="flex items-center justify-between text-sm">
-                                    <label className="flex items-center gap-2 cursor-pointer">
-                                        <input type="checkbox" className="w-4 h-4 rounded bg-white/5 border-white/20 accent-primary" />
-                                        <span className="text-white/40">Remember me</span>
+                                    <label className="auth-checkbox flex items-center gap-2 cursor-pointer">
+                                        <input type="checkbox" />
+                                        <span>Remember me</span>
                                     </label>
-                                    <a href="#" className="text-primary hover:text-primary-light transition-colors">Forgot password?</a>
+                                    <a href="#" className="auth-link">Forgot password?</a>
                                 </div>
 
-                                <AnimatedButton type="submit" variant="secondary" size="lg" className="w-full">
-                                    Sign In
+                                <AnimatedButton type="submit" variant="primary" size="lg" className="auth-submit w-full">
+                                    Sign In <ArrowRight size={17} />
                                 </AnimatedButton>
                             </form>
 
                             <div className="mt-6 text-center">
-                                <p className="text-sm text-white/40">
+                                <p className="auth-switch text-sm">
                                     Don't have an account?{' '}
-                                    <Link to="/signup" className="text-primary hover:text-primary-light font-medium transition-colors">
+                                    <Link to="/signup" className="auth-link font-medium transition-colors">
                                         Sign up
                                     </Link>
                                 </p>
                             </div>
                         </div>
-                    </motion.div>
+                    </div>
                 </div>
             </GradientBackground>
         </PageTransition>

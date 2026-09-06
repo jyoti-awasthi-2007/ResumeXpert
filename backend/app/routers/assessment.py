@@ -11,12 +11,16 @@ from app.schemas import (
     AssessmentResultResponse,
 )
 from app.services import AssessmentService
+from app.services.career import CareerService
+from app.services.resume import ResumeService
 from app.utils import get_error_response, get_success_response
 
 logger = logging.getLogger(__name__)
 
 router = APIRouter(prefix="/api/assessments", tags=["Assessments"])
 assessment_service = AssessmentService()
+career_service = CareerService()
+resume_service = ResumeService()
 
 
 @router.post("/generate")
@@ -32,8 +36,19 @@ async def generate_assessment(request: AssessmentRequest) -> dict[str, Any]:
     }
     """
     try:
+        resume_skills = resume_service.get_resume_skills(request.resume_id)
+        skills = [
+            skill.get("name", "") if isinstance(skill, dict) else str(skill)
+            for skill in resume_skills
+        ]
+        skills = [skill for skill in skills if skill]
+
+        if not skills:
+            career = career_service.get_career_details(request.career_id)
+            skills = career.get("required_skills", [])
+
         assessment = assessment_service.generate_assessment(
-            request.skills,
+            skills,
             request.difficulty,
             getattr(request, "user_id", None)
         )

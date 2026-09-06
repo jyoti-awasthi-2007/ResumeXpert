@@ -21,6 +21,7 @@ import ClaimComparisonPage from './pages/ClaimComparisonPage'
 import CareerReadiness from './pages/CareerReadiness'
 import Analytics from './pages/ResultsAnalytics'
 import Settings from './pages/Settings'
+import Profile from './pages/Profile'
 
 function App() {
   return (
@@ -48,6 +49,7 @@ function App() {
         <Route path="/career-readiness"   element={<CareerReadiness />} />
         <Route path="/analytics"          element={<Analytics />} />
         <Route path="/settings"           element={<Settings />} />
+        <Route path="/profile"            element={<Profile />} />
         </Route>
       </Routes>
       <HelpChatbot />

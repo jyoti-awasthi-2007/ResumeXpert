@@ -1,10 +1,10 @@
-import { useEffect, useMemo, useState } from 'react'
+import { useEffect, useMemo, useRef, useState } from 'react'
 import { useNavigate, useParams } from 'react-router-dom'
 import { useCareerLens } from '../context/CareerLensContext'
 import DashboardLayout from '../layouts/DashboardLayout'
 import PageTransition from '../components/PageTransition'
 import QuestionCard from '../components/QuestionCard'
-import { ChevronLeft, ChevronRight, CircleDot } from 'lucide-react'
+import { ChevronLeft, ChevronRight, CircleDot, Clock, LoaderCircle } from 'lucide-react'
 
 export default function AssessmentLevel() {
   const { level } = useParams()
@@ -15,18 +15,44 @@ export default function AssessmentLevel() {
   const [finished, setFinished] = useState(false)
   const [result, setResult] = useState(null)
   const [loading, setLoading] = useState(true)
+  const [submitting, setSubmitting] = useState(false)
+  const [error, setError] = useState('')
+  const [timeLeft, setTimeLeft] = useState(15 * 60)
+  const generationKey = useRef('')
   const navigate = useNavigate()
 
   const currentQuestion = questions[current]
   const levelMeta = useMemo(() => assessmentLevels.find((item) => item.id === level), [assessmentLevels, level])
 
   useEffect(() => {
-    let active = true
+    if (!resumeState.id || !selectedCareer?.id) return
+    const requestKey = `${resumeState.id}:${selectedCareer.id}:${level}`
+    if (generationKey.current === requestKey) return
+    generationKey.current = requestKey
+    setLoading(true)
+    setError('')
     generateAssessmentQuestions(level).then((data) => {
-      if (active) { setQuestions(data.questions || data); setLoading(false) }
-    }).catch(() => { if (active) setLoading(false) })
-    return () => { active = false }
-  }, [generateAssessmentQuestions, level])
+      const nextQuestions = Array.isArray(data?.questions) ? data.questions : []
+      setQuestions(nextQuestions)
+      setCurrent(0)
+      setSelectedAnswers([])
+      setLoading(false)
+    }).catch((requestError) => {
+      setError(requestError?.response?.data?.message || requestError?.message || 'Unable to prepare the assessment.')
+      setLoading(false)
+    })
+    return undefined
+  }, [generateAssessmentQuestions, level, resumeState.id, selectedCareer?.id])
+
+  useEffect(() => {
+    if (loading || finished || submitting || !questions.length) return undefined
+    if (timeLeft <= 0) {
+      setError('Time is up. Please submit the assessment again.')
+      return undefined
+    }
+    const timer = window.setInterval(() => setTimeLeft((remaining) => Math.max(remaining - 1, 0)), 1000)
+    return () => window.clearInterval(timer)
+  }, [loading, finished, submitting, questions.length, timeLeft])
 
   useEffect(() => {
     if (!resumeState.uploaded && !loading) {
@@ -45,16 +71,30 @@ export default function AssessmentLevel() {
   const currentSelection = selectedAnswers[current]?.answer ?? null
 
   const handleNext = () => {
+    if (submitting || currentSelection === null) return
     if (current < questions.length - 1) {
       setCurrent((prev) => prev + 1)
     } else {
       const answers = questions.map((question, index) => ({
         question_id: question.id,
-        answer: selectedAnswers[index]?.answer,
+        answer: selectedAnswers[index]?.answer ?? -1,
       }))
-      submitAssessment(answers).then((resultData) => { setResult(resultData); setFinished(true) })
+      setSubmitting(true)
+      setError('')
+      submitAssessment(answers)
+        .then((resultData) => {
+          if (resultData?.code || typeof resultData?.score !== 'number') {
+            throw new Error(resultData?.message || 'The assessment result was not returned.')
+          }
+          setResult(resultData)
+          setFinished(true)
+        })
+        .catch((requestError) => setError(requestError?.response?.data?.message || requestError?.message || 'Unable to submit the assessment.'))
+        .finally(() => setSubmitting(false))
     }
   }
+
+  const formatTime = (seconds) => `${Math.floor(seconds / 60).toString().padStart(2, '0')}:${(seconds % 60).toString().padStart(2, '0')}`
 
   const handlePrevious = () => {
     if (current > 0) setCurrent((prev) => prev - 1)
@@ -65,7 +105,21 @@ export default function AssessmentLevel() {
       <PageTransition>
         <DashboardLayout title="Assessment">
           <div className="glass-card p-10 text-center">
-            <p className="text-white/50">Preparing your assessment...</p>
+            <div className="flex items-center justify-center gap-2 text-white/50"><LoaderCircle size={18} className="animate-spin" /> Preparing your assessment...</div>
+          </div>
+        </DashboardLayout>
+      </PageTransition>
+    )
+  }
+
+  if ((error || !questions.length) && !loading) {
+    return (
+      <PageTransition>
+        <DashboardLayout title="Assessment">
+          <div className="glass-card mx-auto max-w-2xl p-10 text-center">
+            <h2 className="mb-3 text-2xl font-semibold text-white">Assessment unavailable</h2>
+            <p className="mb-6 text-white/60">{error || 'No questions were generated. Please try this assessment again.'}</p>
+            <button onClick={() => navigate('/assessment')} className="rounded-full bg-linear-to-r from-primary to-purple-500 px-6 py-3 font-semibold text-white">Back to assessments</button>
           </div>
         </DashboardLayout>
       </PageTransition>
@@ -154,12 +208,17 @@ export default function AssessmentLevel() {
               </div>
               <div className="flex items-center gap-3 text-sm text-white/50">
                 <span>Question {current + 1} of {questions.length}</span>
+                <span className={`inline-flex items-center gap-1 rounded-full px-3 py-1 font-mono ${timeLeft < 60 ? 'bg-red-500/20 text-red-300' : 'bg-white/5 text-white/60'}`}>
+                  <Clock size={14} /> {formatTime(timeLeft)}
+                </span>
                 <span className="inline-flex items-center gap-1 rounded-full bg-white/5 px-3 py-1 text-white/60">
                   <CircleDot size={14} /> Progress
                 </span>
               </div>
             </div>
           </div>
+
+          {error && <p className="rounded-xl border border-red-400/20 bg-red-400/10 px-4 py-3 text-sm text-red-200">{error}</p>}
 
           <QuestionCard
             question={currentQuestion}
@@ -177,10 +236,10 @@ export default function AssessmentLevel() {
             </button>
             <button
               onClick={handleNext}
-              disabled={currentSelection === null}
+              disabled={currentSelection === null || submitting || timeLeft <= 0}
               className="inline-flex items-center gap-2 px-5 py-3 rounded-full bg-linear-to-r from-primary to-purple-500 text-white font-semibold disabled:opacity-40 disabled:cursor-not-allowed hover:brightness-110 transition"
             >
-              {current === questions.length - 1 ? 'Submit Assessment' : 'Next'}
+              {submitting ? 'Submitting...' : current === questions.length - 1 ? 'Submit Assessment' : 'Next'}
               <ChevronRight size={18} />
             </button>
           </div>

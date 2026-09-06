@@ -102,17 +102,15 @@ class AssessmentEngine:
         """
         questions = []
         
-        # Get questions from question bank
-        available_questions = self._get_questions_from_bank(
-            skills, difficulty, num_questions
-        )
-        
-        # If not enough from bank, generate with AI
+        # Generate career-specific questions with the configured Groq provider first.
+        available_questions = self._generate_with_ai(skills, difficulty, num_questions)
+
+        # Keep the assessment usable when the provider is unavailable or returns too few questions.
         if len(available_questions) < num_questions:
-            ai_questions = self._generate_with_ai(
+            bank_questions = self._get_questions_from_bank(
                 skills, difficulty, num_questions - len(available_questions)
             )
-            available_questions.extend(ai_questions)
+            available_questions.extend(bank_questions)
         
         # Format questions
         for i, q in enumerate(available_questions[:num_questions]):
@@ -146,8 +144,9 @@ class AssessmentEngine:
         total_correct = 0
         total_questions = len(questions)
         
-        for i, question in enumerate(questions):
-            user_answer = answers[i][1] if i < len(answers) else -1
+        answer_map = {question_id: answer for question_id, answer in answers}
+        for question in questions:
+            user_answer = answer_map.get(question["id"], -1)
             correct_answer = question["correct_answer"]
             skill = question.get("skill", "General")
             
@@ -219,12 +218,21 @@ class AssessmentEngine:
         questions = []
         
         for skill in skills[:3]:  # Limit to first 3 skills
-            for _ in range(min(2, num_questions - len(questions))):
+            for _ in range(num_questions - len(questions)):
                 try:
                     ai_question = ai_service.generate_mcq(skill, difficulty)
-                    questions.append(ai_question)
+                    if "correct" not in ai_question and "correct_answer" in ai_question:
+                        ai_question["correct"] = ai_question["correct_answer"]
+                    question_text = ai_question.get("question", "").strip().lower()
+                    known_questions = {item.get("question", "").strip().lower() for item in questions}
+                    if question_text and question_text not in known_questions:
+                        questions.append(ai_question)
                 except Exception as e:
                     logger.warning(f"Error generating AI question: {e}")
+                if len(questions) >= num_questions:
+                    break
+            if len(questions) >= num_questions:
+                break
         
         return questions
 

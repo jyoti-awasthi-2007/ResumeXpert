@@ -1,244 +1,66 @@
 import { motion } from 'framer-motion'
 import { Link } from 'react-router-dom'
-import { Shield, Brain, FileCheck, Zap, ChevronRight, Award, Lock, BarChart3, Users, ArrowRight, CheckCircle } from 'lucide-react'
+import { ArrowRight, BarChart3, Brain, CheckCircle2, ChevronRight, Cloud, FileCheck2, Gauge, GraduationCap, Sparkles, Target, TrendingUp, Users, Zap } from 'lucide-react'
 import Navbar from '../components/Navbar'
 import AnimatedButton from '../components/AnimatedButton'
 import GradientBackground from '../components/GradientBackground'
 import PageTransition from '../components/PageTransition'
 
-const fadeUp = {
-    initial: { opacity: 0, y: 40 },
+const reveal = {
+    initial: { opacity: 0, y: 28 },
     whileInView: { opacity: 1, y: 0 },
-    viewport: { once: true },
-    transition: { duration: 0.7 }
+    viewport: { once: true, amount: 0.2 },
+    transition: { duration: 0.65, ease: 'easeOut' },
 }
 
-const stagger = {
-    initial: { opacity: 0 },
-    whileInView: { opacity: 1 },
-    viewport: { once: true },
-    transition: { staggerChildren: 0.15 }
-}
+const journey = [
+    { number: '01', icon: FileCheck2, title: 'Read your resume', text: 'Turn your experience into a clear skill profile in seconds.' },
+    { number: '02', icon: Brain, title: 'Measure what you know', text: 'Use focused assessments to validate your strongest claims.' },
+    { number: '03', icon: Target, title: 'Choose your next move', text: 'Get a practical career path and the skills to learn next.' },
+]
+
+const features = [
+    { icon: Sparkles, title: 'Resume intelligence', text: 'See strengths, missing keywords, and the story your resume tells.' },
+    { icon: TrendingUp, title: 'Career matching', text: 'Compare your current profile with roles that fit your momentum.' },
+    { icon: Gauge, title: 'Skill confidence', text: 'Replace guesswork with a confidence score for every key skill.' },
+    { icon: BarChart3, title: 'Readiness analytics', text: 'Track progress from first upload to your next opportunity.' },
+    { icon: GraduationCap, title: 'Personal learning path', text: 'Prioritize the skills that make the biggest career difference.' },
+    { icon: Cloud, title: 'Always in reach', text: 'Keep your career workspace ready whenever inspiration strikes.' },
+]
 
 export default function LandingPage() {
     return (
         <PageTransition>
             <GradientBackground variant="default">
                 <Navbar />
-
-                {/* Hero */}
-                <section className="min-h-screen px-4 pt-24">
-                    <div className="max-w-7xl mx-auto grid grid-cols-1 lg:grid-cols-12 gap-8 items-center">
-                        <div className="lg:col-span-6 order-2 lg:order-1">
-                            <motion.div initial={{ opacity: 0, y: 20 }} animate={{ opacity: 1, y: 0 }} transition={{ duration: 0.7 }}>
-                                <div className="inline-flex items-center gap-2 px-4 py-2 rounded-full bg-surface-secondary text-sm text-secondary mb-6">
-                                    <Zap size={14} className="text-accent" />
-                                    AI-Powered Verification Platform
+                <main className="landing-page">
+                    <section className="landing-hero">
+                        <div className="landing-hero-grid">
+                            <motion.div {...reveal} className="landing-hero-copy">
+                                <span className="landing-pill"><span className="landing-pill-dot" /> Built for your next chapter</span>
+                                <h1>Your career deserves more than a <span>static resume.</span></h1>
+                                <p className="landing-lead">ResumeXpert turns your experience, skills, and ambitions into a clearer path forward, so you can move from &quot;I think I am ready&quot; to &quot;I know what is next.&quot;</p>
+                                <div className="landing-hero-actions"><Link to="/signup"><AnimatedButton variant="primary" size="lg" icon={ArrowRight}>Start your journey</AnimatedButton></Link><a href="#how-it-works" className="landing-text-link">See how it works <ChevronRight size={17} /></a></div>
+                                <div className="landing-trust-line"><CheckCircle2 size={17} /> <span>Free to explore</span><i /> <span>No complicated setup</span></div>
+                            </motion.div>
+                            <motion.div className="landing-preview-wrap" initial={{ opacity: 0, scale: .92, y: 24 }} animate={{ opacity: 1, scale: 1, y: 0 }} transition={{ duration: .8, delay: .15, ease: 'easeOut' }}>
+                                <div className="landing-preview-glow" />
+                                <div className="landing-preview-card">
+                                    <div className="preview-topbar"><span className="preview-dots"><i /><i /><i /></span><span className="preview-topbar-label">Career snapshot</span><span className="preview-topbar-status"><span /> Live</span></div>
+                                    <div className="preview-heading"><div><span className="preview-overline">Good morning, Aisha</span><h2>Your readiness is moving up.</h2></div><span className="preview-avatar">AK</span></div>
+                                    <div className="preview-score-row"><div className="preview-score-ring"><div><strong>81</strong><span>/ 100</span></div></div><div className="preview-score-copy"><strong>Good preparation</strong><p>Keep building the skills that turn potential into proof.</p><div className="preview-mini-line"><i /></div><small>+12% this month</small></div></div>
+                                    <div className="preview-bottom-grid"><div className="preview-mini-card"><span className="preview-icon blue"><Brain size={15} /></span><small>Skills detected</small><strong>12</strong><em>+ 3 new</em></div><div className="preview-mini-card"><span className="preview-icon orange"><Target size={15} /></span><small>Career matches</small><strong>5</strong><em>Top fit 91%</em></div><div className="preview-mini-card"><span className="preview-icon green"><GraduationCap size={15} /></span><small>Skill confidence</small><strong>82%</strong><em>Growing</em></div></div>
+                                    <div className="preview-floating-badge"><span><Sparkles size={14} /></span><div><strong>Next best skill</strong><small>Cloud deployment</small></div><ArrowRight size={14} /></div>
                                 </div>
-
-                                <h1 className="text-4xl sm:text-5xl lg:text-6xl font-extrabold leading-tight text-primary mb-6">
-                                    Verify the right talent with <span className="sig-gradient text-transparent gradient-text">AI-powered insights</span>
-                                </h1>
-
-                                <p className="text-lg text-secondary max-w-2xl mb-8">Analyze your resume, discover career paths, close skill gaps, and measure the knowledge behind your claims.</p>
-
-                                <div className="flex flex-col sm:flex-row gap-4 items-start sm:items-center">
-                                    <Link to="/signup">
-                                        <AnimatedButton variant="primary" size="lg" icon={ArrowRight}>Get Started</AnimatedButton>
-                                    </Link>
-                                    <Link to="/dashboard">
-                                        <AnimatedButton variant="secondary" size="lg">Open Dashboard</AnimatedButton>
-                                    </Link>
-                                </div>
+                                <span className="landing-float-label landing-float-one"><span className="float-label-icon green"><CheckCircle2 size={15} /></span> Resume analyzed</span><span className="landing-float-label landing-float-two"><span className="float-label-icon orange"><Zap size={15} /></span> Your next step</span>
                             </motion.div>
                         </div>
-
-                        <div className="lg:col-span-6 order-1 lg:order-2 relative flex justify-center">
-                            {/* Decorative blobs */}
-                            <div className="hero-blob" style={{ width: 420, height: 420, background: 'linear-gradient(90deg,var(--grad-1),var(--grad-2))', right: -60, top: 40 }} />
-                            <div className="hero-blob" style={{ width: 260, height: 260, background: 'linear-gradient(90deg,var(--grad-2),var(--grad-3))', left: -40, bottom: -20 }} />
-
-                            <motion.div initial={{ opacity: 0, y: 30 }} animate={{ opacity: 1, y: 0 }} transition={{ duration: 0.8 }} className="relative w-full max-w-md">
-                                <div className="bg-surface rounded-2xl p-6 shadow-md card-float">
-                                    <div className="flex items-center justify-between mb-4">
-                                        <div>
-                                            <p className="text-sm text-secondary">Trust Score</p>
-                                            <p className="text-2xl font-bold text-primary">94%</p>
-                                        </div>
-                                        <div className="w-12 h-12 rounded-lg sig-gradient flex items-center justify-center">
-                                            <Shield size={20} className="text-white" />
-                                        </div>
-                                    </div>
-                                    <p className="text-sm text-secondary">Career paths analyzed • 2,847</p>
-                                </div>
-
-                                <div className="mt-6 grid grid-cols-2 gap-4">
-                                    <div className="bg-surface p-4 rounded-xl card-float">
-                                        <p className="text-xs text-secondary">Fraud Detected</p>
-                                        <p className="font-semibold text-primary">12.3%</p>
-                                    </div>
-                                    <div className="bg-surface p-4 rounded-xl card-float">
-                                        <p className="text-xs text-secondary">Assessments</p>
-                                        <p className="font-semibold text-primary">1,204</p>
-                                    </div>
-                                </div>
-                            </motion.div>
-                        </div>
-                    </div>
-                </section>
-
-                {/* Problem Section */}
-                <section className="py-20 px-4 bg-white">
-                    <div className="max-w-6xl mx-auto">
-                        <motion.div {...fadeUp} className="text-center mb-12">
-                            <h2 className="text-3xl sm:text-4xl font-bold text-primary mb-4">The Problem We Solve</h2>
-                            <p className="text-secondary max-w-xl mx-auto">Credential fraud costs businesses billions annually. Traditional verification methods are slow and unreliable.</p>
-                        </motion.div>
-                        <div className="grid md:grid-cols-3 gap-6">
-                            {[
-                                { icon: FileCheck, title: 'Unclear Resumes', desc: 'Important skills and outcomes are often difficult to identify quickly.' },
-                                { icon: Users, title: 'Slow Verification', desc: 'Manual verification takes 5-10 business days, delaying hiring decisions.' },
-                                { icon: Lock, title: 'No Skill Proof', desc: 'A resume claim is more useful when backed by demonstrated knowledge.' },
-                            ].map((item, i) => (
-                                <motion.div
-                                    key={item.title}
-                                    initial={{ opacity: 0, y: 30 }}
-                                    whileInView={{ opacity: 1, y: 0 }}
-                                    viewport={{ once: true }}
-                                    transition={{ delay: i * 0.15, duration: 0.6 }}
-                                    whileHover={{ y: -8 }}
-                                    className="bg-surface p-8 text-center rounded-2xl card-float"
-                                >
-                                    <div className="w-14 h-14 mx-auto mb-5 rounded-2xl flex items-center justify-center" style={{ background: 'linear-gradient(90deg,var(--grad-1),var(--grad-2))' }}>
-                                        <item.icon size={28} className="text-white" />
-                                    </div>
-                                    <h3 className="text-lg font-semibold text-primary mb-2">{item.title}</h3>
-                                    <p className="text-sm text-secondary">{item.desc}</p>
-                                </motion.div>
-                            ))}
-                        </div>
-                    </div>
-                </section>
-
-                {/* How it Works */}
-                <section id="how-it-works" className="py-24 px-4">
-                    <div className="max-w-6xl mx-auto">
-                        <motion.div {...fadeUp} className="text-center mb-16">
-                            <h2 className="text-3xl sm:text-4xl font-bold text-white mb-4">How It Works</h2>
-                            <p className="text-white/50 max-w-xl mx-auto">Three simple steps from resume to career readiness.</p>
-                        </motion.div>
-                        <div className="grid md:grid-cols-3 gap-8">
-                            {[
-                                { step: '01', icon: Brain, title: 'Upload & Analyze', desc: 'Upload a resume and extract the skills, experience, and education that shape your profile.' },
-                                { step: '02', icon: Shield, title: 'Test Your Skills', desc: 'Take a career-specific assessment to measure demonstrated knowledge at your chosen level.' },
-                                { step: '03', icon: Award, title: 'Build Your Path', desc: 'See your gaps, confidence, readiness, and the next skills to learn.' },
-                            ].map((item, i) => (
-                                <motion.div
-                                    key={item.step}
-                                    initial={{ opacity: 0, y: 30 }}
-                                    whileInView={{ opacity: 1, y: 0 }}
-                                    viewport={{ once: true }}
-                                    transition={{ delay: i * 0.2, duration: 0.7 }}
-                                    className="relative"
-                                >
-                                    <div className="glass-card-strong p-8 relative overflow-hidden">
-                                        <span className="absolute top-4 right-4 text-6xl font-black text-white/3">{item.step}</span>
-                                        <div className="w-12 h-12 mb-5 rounded-xl bg-linear-to-br from-primary to-accent flex items-center justify-center">
-                                            <item.icon size={24} className="text-white" />
-                                        </div>
-                                        <h3 className="text-lg font-semibold text-white mb-2">{item.title}</h3>
-                                        <p className="text-sm text-white/40 leading-relaxed">{item.desc}</p>
-                                    </div>
-                                    {i < 2 && (
-                                        <div className="hidden md:block absolute top-1/2 -right-4 transform translate-x-full">
-                                            <ChevronRight size={20} className="text-white/20" />
-                                        </div>
-                                    )}
-                                </motion.div>
-                            ))}
-                        </div>
-                    </div>
-                </section>
-
-                {/* Features */}
-                <section id="features" className="py-20 px-4 bg-white">
-                    <div className="max-w-6xl mx-auto">
-                        <motion.div {...fadeUp} className="text-center mb-12">
-                            <h2 className="text-3xl sm:text-4xl font-bold text-primary mb-4">Powerful Features</h2>
-                            <p className="text-secondary max-w-xl mx-auto">Everything you need to verify credentials at scale.</p>
-                        </motion.div>
-                        <div className="grid sm:grid-cols-2 lg:grid-cols-3 gap-6">
-                            {[
-                                { icon: Brain, title: 'AI Resume Parsing', desc: 'Extract skills, experience, and education using NLP.' },
-                                { icon: FileCheck, title: 'Resume Analysis', desc: 'Understand the quality and coverage of your resume.' },
-                                { icon: Shield, title: 'Skill Validation', desc: 'Compare resume claims with assessment performance.' },
-                                { icon: BarChart3, title: 'Rich Analytics', desc: 'Detailed dashboards with trust scores and risk metrics.' },
-                                { icon: Award, title: 'Career Readiness', desc: 'Combine resume quality, skill match, and demonstrated knowledge.' },
-                                { icon: Users, title: 'Personalized Guidance', desc: 'Get a practical learning order for your next skills.' },
-                            ].map((feature, i) => (
-                                <motion.div
-                                    key={feature.title}
-                                    initial={{ opacity: 0, y: 20 }}
-                                    whileInView={{ opacity: 1, y: 0 }}
-                                    viewport={{ once: true }}
-                                    transition={{ delay: i * 0.1, duration: 0.5 }}
-                                    whileHover={{ y: -5, scale: 1.02 }}
-                                    className="bg-surface p-6 group cursor-pointer rounded-2xl card-float"
-                                >
-                                    <div className="w-11 h-11 mb-4 rounded-xl flex items-center justify-center" style={{ background: 'linear-gradient(90deg,var(--grad-1),var(--grad-2))' }}>
-                                        <feature.icon size={22} className="text-white" />
-                                    </div>
-                                    <h3 className="text-base font-semibold text-primary mb-1">{feature.title}</h3>
-                                    <p className="text-sm text-secondary">{feature.desc}</p>
-                                </motion.div>
-                            ))}
-                        </div>
-                    </div>
-                </section>
-
-                {/* CTA */}
-                <section className="py-24 px-4">
-                    <motion.div
-                        initial={{ opacity: 0, scale: 0.95 }}
-                        whileInView={{ opacity: 1, scale: 1 }}
-                        viewport={{ once: true }}
-                        className="max-w-4xl mx-auto glass-card-strong p-12 text-center relative overflow-hidden"
-                    >
-                        <motion.div
-                            className="absolute inset-0 bg-linear-to-r from-primary/10 via-accent/10 to-primary/10"
-                            animate={{ backgroundPosition: ['0% 50%', '100% 50%', '0% 50%'] }}
-                            transition={{ duration: 8, repeat: Infinity }}
-                            style={{ backgroundSize: '200% 200%' }}
-                        />
-                        <div className="relative z-10">
-                            <h2 className="text-3xl sm:text-4xl font-bold text-white mb-4">Ready to Verify Smarter?</h2>
-                            <p className="text-white/50 mb-8 max-w-lg mx-auto">Build a clearer path from what your resume claims to what you can demonstrate.</p>
-                            <Link to="/signup">
-                                <AnimatedButton variant="secondary" size="lg" icon={ArrowRight}>
-                                    Start Free Today
-                                </AnimatedButton>
-                            </Link>
-                        </div>
-                    </motion.div>
-                </section>
-
-                {/* Footer */}
-                <footer className="py-12 px-4" style={{ background: 'var(--color-text-primary)', color: 'white' }}>
-                    <div className="max-w-6xl mx-auto flex flex-col sm:flex-row items-center justify-between gap-6">
-                        <div className="flex items-center gap-2">
-                            <div className="w-8 h-8 rounded-lg" style={{ background: 'linear-gradient(90deg,var(--grad-1),var(--grad-2))', display: 'flex', alignItems: 'center', justifyContent: 'center' }}>
-                                <Shield size={16} className="text-white" />
-                            </div>
-                            <span className="font-bold gradient-text">ResumeXpert</span>
-                        </div>
-                        <div className="flex items-center gap-6 text-sm text-white/80">
-                            <a href="#" className="hover:text-white transition-colors">Privacy</a>
-                            <a href="#" className="hover:text-white transition-colors">Terms</a>
-                            <a href="#" className="hover:text-white transition-colors">Contact</a>
-                        </div>
-                        <p className="text-sm text-white/60">© 2026 ResumeXpert. All rights reserved.</p>
-                    </div>
-                </footer>
+                    </section>
+                    <section className="landing-metrics" aria-label="ResumeXpert highlights"><div><strong>12+</strong><span>career signals<br />from one resume</span></div><div><strong>5</strong><span>focused paths<br />to explore</span></div><div><strong>1</strong><span>clearer direction<br />for your next move</span></div><div className="landing-metrics-note"><Sparkles size={17} /> Your momentum, made visible.</div></section>
+                    <section id="how-it-works" className="landing-section landing-journey-section"><motion.div {...reveal} className="landing-section-heading"><span className="landing-eyebrow">A clearer way forward</span><h2>From resume to <span>ready.</span></h2><p>Every feature works together to help you understand where you are and decide where to go next.</p></motion.div><div className="landing-journey-grid">{journey.map((item, index) => <motion.div {...reveal} transition={{ ...reveal.transition, delay: index * .12 }} className="landing-journey-card" key={item.number}><span className="journey-number">{item.number}</span><span className="journey-icon"><item.icon size={24} /></span><h3>{item.title}</h3><p>{item.text}</p>{index < journey.length - 1 && <ChevronRight className="journey-arrow" size={21} />}</motion.div>)}</div></section>
+                    <section id="features" className="landing-section landing-features-section"><motion.div {...reveal} className="landing-section-heading landing-section-heading-left"><span className="landing-eyebrow">Everything in one view</span><h2>Make your next move <span>feel intentional.</span></h2><p>Less noise. Better questions. A career workspace that grows with you.</p></motion.div><div className="landing-feature-grid">{features.map((feature, index) => <motion.div {...reveal} transition={{ ...reveal.transition, delay: index * 0.06 }} whileHover={{ y: -7 }} className="landing-feature-card" key={feature.title}><span className={`feature-icon feature-tone-${index % 4}`}><feature.icon size={21} /></span><div><h3>{feature.title}</h3><p>{feature.text}</p></div><ArrowRight className="feature-arrow" size={17} /></motion.div>)}</div></section>
+                    <section className="landing-cta-section"><motion.div {...reveal} className="landing-cta"><div className="landing-cta-shape landing-cta-shape-one" /><div className="landing-cta-shape landing-cta-shape-two" /><div className="landing-cta-content"><span className="landing-eyebrow landing-eyebrow-light">Your next chapter starts here</span><h2>Stop wondering.<br /><span>Start building.</span></h2><p>Bring your resume. We will help you find the signal, the gap, and the next step.</p><Link to="/signup"><AnimatedButton variant="secondary" size="lg" icon={ArrowRight}>Create your free workspace</AnimatedButton></Link></div><div className="landing-cta-stat"><Users size={20} /><strong>One workspace</strong><span>for your complete career picture</span></div></motion.div></section>
+                </main>
             </GradientBackground>
         </PageTransition>
     )

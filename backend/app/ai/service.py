@@ -110,9 +110,21 @@ Return ONLY valid JSON in this exact format:
                 timeout=self.timeout,
             )
             
-            content = response.choices[0].message.content
+            content = response.choices[0].message.content or ""
+            # Some compatible providers wrap JSON in a markdown code fence.
+            content = content.strip().removeprefix("```json").removesuffix("```").strip()
             result = json.loads(content)
-            return result
+            options = result.get("options", [])
+            correct_answer = result.get("correct_answer", result.get("correct"))
+            if not result.get("question") or len(options) != 4 or len(set(options)) != 4 or not isinstance(correct_answer, int) or not 0 <= correct_answer < 4:
+                raise ValueError("AI returned an invalid MCQ shape")
+            return {
+                "question": result["question"],
+                "options": options,
+                "correct": correct_answer,
+                "correct_answer": correct_answer,
+                "explanation": result.get("explanation", ""),
+            }
         except Exception as error:
             logger.error(f"Error generating MCQ: {error}")
             return self._get_fallback_mcq(skill, difficulty)

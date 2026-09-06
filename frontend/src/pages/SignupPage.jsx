@@ -1,7 +1,6 @@
 import { useState } from 'react'
 import { Link, useNavigate } from 'react-router-dom'
-import { motion } from 'framer-motion'
-import { Mail, Lock, Eye, EyeOff, User } from 'lucide-react'
+import { Mail, Lock, Eye, EyeOff, User, ArrowRight, ShieldCheck, Sparkles } from 'lucide-react'
 import GradientBackground from '../components/GradientBackground'
 import AnimatedButton from '../components/AnimatedButton'
 import PageTransition from '../components/PageTransition'
@@ -27,22 +26,26 @@ export default function SignupPage() {
     return (
         <PageTransition>
             <GradientBackground variant="auth">
-                <div className="min-h-screen flex items-center justify-center px-4 py-12">
-                    <motion.div
+                <div className="auth-page min-h-screen flex items-center justify-center px-4 py-8">
+                    <div
                         initial={{ opacity: 0, y: 30, scale: 0.95 }}
                         animate={{ opacity: 1, y: 0, scale: 1 }}
                         transition={{ duration: 0.7 }}
-                        className="w-full max-w-md"
+                        className="auth-frame w-full max-w-5xl"
                     >
-                        <div className="text-center mb-8">
-                            <Link to="/" className="inline-flex mb-6">
-                                <BrandLockup />
-                            </Link>
-                            <h1 className="text-3xl font-bold text-white mb-2">Create your account</h1>
-                            <p className="text-white/40">Start verifying credentials today</p>
+                        <div className="auth-showcase">
+                            <Link to="/" className="auth-brand"><BrandLockup /></Link>
+                            <div className="auth-showcase-copy">
+                                <span className="auth-kicker"><Sparkles size={15} /> Start your career journey</span>
+                                <h1>Make your next move feel <em>intentional.</em></h1>
+                                <p>Create your workspace to turn your resume into practical, AI-guided career momentum.</p>
+                            </div>
+                            <div className="auth-proof"><span className="auth-proof-icon"><ShieldCheck size={20} /></span><span><strong>Your progress, in one place</strong><small>Skills, readiness, and recommendations together</small></span></div>
+                            <div className="auth-orbit auth-orbit-one" /><div className="auth-orbit auth-orbit-two" /><div className="auth-showcase-dots">✦<br /><span>+</span> ✦</div>
                         </div>
 
-                        <div className="glass-card-strong p-8">
+                        <div className="auth-form-panel">
+                            <div className="auth-form-heading"><span className="auth-mobile-brand"><Link to="/"><BrandLockup compact /></Link></span><p className="auth-form-kicker">Create your account</p><h2>Build your career workspace</h2><p>It only takes a minute to get started.</p></div>
                             <form onSubmit={handleSubmit} className="space-y-5">
                                 {/* Name */}
                                 <div className="relative">
@@ -54,7 +57,7 @@ export default function SignupPage() {
                                         onFocus={() => setFocused('name')}
                                         onBlur={() => setFocused('')}
                                         placeholder="Full name"
-                                        className="w-full pl-12 pr-4 py-3.5 bg-white/5 border border-white/10 rounded-xl text-white placeholder-white/30 focus:outline-none focus:border-primary/50 focus:bg-white/[0.07] transition-all"
+                                        className="auth-input w-full pl-12 pr-4 py-3.5"
                                     />
                                 </div>
 
@@ -68,7 +71,7 @@ export default function SignupPage() {
                                         onFocus={() => setFocused('email')}
                                         onBlur={() => setFocused('')}
                                         placeholder="Email address"
-                                        className="w-full pl-12 pr-4 py-3.5 bg-white/5 border border-white/10 rounded-xl text-white placeholder-white/30 focus:outline-none focus:border-primary/50 focus:bg-white/[0.07] transition-all"
+                                        className="auth-input w-full pl-12 pr-4 py-3.5"
                                     />
                                 </div>
 
@@ -83,7 +86,7 @@ export default function SignupPage() {
                                             onFocus={() => setFocused('password')}
                                             onBlur={() => setFocused('')}
                                             placeholder="Password"
-                                            className="w-full pl-12 pr-12 py-3.5 bg-white/5 border border-white/10 rounded-xl text-white placeholder-white/30 focus:outline-none focus:border-primary/50 focus:bg-white/[0.07] transition-all"
+                                            className="auth-input w-full pl-12 pr-12 py-3.5"
                                         />
                                         <button
                                             type="button"
@@ -96,33 +99,33 @@ export default function SignupPage() {
                                     {password && (
                                         <div className="mt-2 flex gap-1">
                                             {[1, 2, 3, 4].map(i => (
-                                                <motion.div
+                                                <div
                                                     key={i}
                                                     initial={{ scaleX: 0 }}
                                                     animate={{ scaleX: i <= strengthScore ? 1 : 0.3 }}
-                                                    className={`h-1 flex-1 rounded-full ${i <= strengthScore ? strengthColors[strengthScore] : 'bg-white/10'}`}
+                                                    className={`auth-strength h-1 flex-1 rounded-full ${i <= strengthScore ? strengthColors[strengthScore] : 'auth-strength-muted'}`}
                                                 />
                                             ))}
-                                            <span className="text-xs text-white/40 ml-2">{strengthLabels[strengthScore]}</span>
+                                            <span className="auth-strength-label text-xs ml-2">{strengthLabels[strengthScore]}</span>
                                         </div>
                                     )}
                                 </div>
 
-                                <AnimatedButton type="submit" variant="secondary" size="lg" className="w-full">
-                                    Create Account
+                                <AnimatedButton type="submit" variant="primary" size="lg" className="auth-submit w-full">
+                                    Create Account <ArrowRight size={17} />
                                 </AnimatedButton>
                             </form>
 
                             <div className="mt-6 text-center">
-                                <p className="text-sm text-white/40">
+                                <p className="auth-switch text-sm">
                                     Already have an account?{' '}
-                                    <Link to="/login" className="text-primary hover:text-primary-light font-medium transition-colors">
+                                    <Link to="/login" className="auth-link font-medium transition-colors">
                                         Sign in
                                     </Link>
                                 </p>
                             </div>
                         </div>
-                    </motion.div>
+                    </div>
                 </div>
             </GradientBackground>
         </PageTransition>

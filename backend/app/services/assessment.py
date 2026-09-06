@@ -35,7 +35,7 @@ class AssessmentService:
         import secrets
         
         # Generate questions (with correct answers for server-side)
-        questions = self.engine.generate_assessment(skills, difficulty, num_questions=5)
+        questions = self.engine.generate_assessment(skills, difficulty, num_questions=10)
         
         # Create assessment ID
         assessment_id = secrets.token_urlsafe(12)
