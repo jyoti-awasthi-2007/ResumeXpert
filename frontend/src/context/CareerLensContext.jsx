@@ -332,31 +332,34 @@ export function CareerLensProvider({ children }) {
 
       setResumeState({ uploaded: true, processing: false, analysis, id: uploaded.resume_id })
       setSkills(analysis.skills || [])
-      await saveProgress({
-        skills: analysis.skills || [],
-        resume_state: { uploaded: true, processing: false, analysis, id: uploaded.resume_id },
-      })
-      await logActivity('resume_analyzed', { resume_id: uploaded.resume_id, skill_count: analysis.skills?.length || 0 })
 
-      // Extract skill names and pass to recommend endpoint (expects skills array, not resume_id)
+      // Run progress save, activity log, and career recommendations concurrently
       const skillNames = (analysis.skills || []).map((s) => s.name).filter(Boolean)
-      try {
-        const recommendationsResult = await recommendCareers(skillNames)
-        const normalizedCareerMatches = Array.isArray(recommendationsResult) && recommendationsResult.length > 0
-          ? recommendationsResult.map(normalizeCareerMatch)
-          : careerMatches
+      Promise.all([
+        saveProgress({
+          skills: analysis.skills || [],
+          resume_state: { uploaded: true, processing: false, analysis, id: uploaded.resume_id },
+        }).catch((err) => console.warn('Could not save progress:', err)),
+        logActivity('resume_analyzed', { resume_id: uploaded.resume_id, skill_count: analysis.skills?.length || 0 }).catch((err) => console.warn('Could not log activity:', err)),
+        recommendCareers(skillNames)
+          .then((recommendationsResult) => {
+            const normalizedCareerMatches = Array.isArray(recommendationsResult) && recommendationsResult.length > 0
+              ? recommendationsResult.map(normalizeCareerMatch)
+              : careerMatches
+            setCareerMatches(normalizedCareerMatches)
+            if (normalizedCareerMatches.length && !normalizedCareerMatches.some((item) => item.id === selectedCareerId)) {
+              setSelectedCareerId(normalizedCareerMatches[0].id)
+            }
+          })
+          .catch((recommendationError) => {
+            console.warn('Career recommendations unavailable after resume analysis:', recommendationError)
+          }),
+      ])
 
-        setCareerMatches(normalizedCareerMatches)
-        if (normalizedCareerMatches.length && !normalizedCareerMatches.some((item) => item.id === selectedCareerId)) {
-          setSelectedCareerId(normalizedCareerMatches[0].id)
-        }
-      } catch (recommendationError) {
-        console.warn('Career recommendations unavailable after resume analysis:', recommendationError)
-      }
       return analysis
     } catch (requestError) {
       setError(apiError(requestError))
-      setResumeState({ uploaded: false, processing: false, analysis, id: null })
+      setResumeState({ uploaded: false, processing: false, analysis: null, id: null })
       throw requestError
     }
   }

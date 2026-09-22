@@ -17,7 +17,6 @@ import Assessment from './pages/Assessment'
 import AssessmentLevel from './pages/AssessmentLevel'
 import AssessmentResults from './pages/AssessmentResults'
 import Confidence from './pages/Confidence'
-import ClaimComparisonPage from './pages/ClaimComparisonPage'
 import CareerReadiness from './pages/CareerReadiness'
 import Analytics from './pages/ResultsAnalytics'
 import Profile from './pages/Profile'
@@ -49,7 +48,6 @@ function App() {
         <Route path="/assessment/results" element={<AssessmentResults />} />
         <Route path="/assessment/results/:assessmentId" element={<AssessmentResults />} />
         <Route path="/confidence"         element={<Confidence />} />
-        <Route path="/claim-vs-actual"    element={<ClaimComparisonPage />} />
         <Route path="/career-readiness"   element={<CareerReadiness />} />
         <Route path="/analytics"          element={<Analytics />} />
         <Route path="/profile"            element={<Profile />} />

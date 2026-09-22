@@ -18,8 +18,10 @@ export default function ResumeUpload() {
         if (!file) return
         setStage('scanning')
         try {
-            await uploadToStorage(file)
-            const analysis = await uploadResume(file)
+            const [, analysis] = await Promise.all([
+                uploadToStorage(file).catch((err) => console.warn('Storage upload note:', err)),
+                uploadResume(file),
+            ])
             setExtractedSkills(analysis.skills?.map((skill) => skill.name) || [])
             setStage('results')
         } catch {

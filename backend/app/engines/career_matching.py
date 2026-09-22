@@ -136,13 +136,6 @@ class CareerMatchingEngine:
             else:
                 status = "Consider Building Skills"
             
-            # Get AI-powered reasoning
-            reasoning = ai_service.generate_career_reasoning(
-                career["title"],
-                list(user_skills),
-                list(missing_required)[:3]
-            )
-            
             recommendations.append({
                 "id": career["id"],
                 "title": career["title"],
@@ -155,12 +148,29 @@ class CareerMatchingEngine:
                 # snake_case also kept for backward compat
                 "matched_skills": sorted([s.title() for s in matched_required.union(matched_preferred)]),
                 "missing_skills": sorted([s.title() for s in missing_required]),
-                "reasoning": reasoning,
+                "reasoning": "",
             })
-        
-        # Sort by score and return top N
+
+        # Sort by score and take top N
         recommendations.sort(key=lambda x: x["score"], reverse=True)
-        return recommendations[:top_n]
+        top_recommendations = recommendations[:top_n]
+
+        # Generate fast personalized reasoning for top recommendations
+        for career in top_recommendations:
+            matched_list = career["matchedSkills"]
+            missing_list = career["missingSkills"]
+            if career["score"] >= 70:
+                career["reasoning"] = f"Strong alignment with {career['title']}. Your expertise in {', '.join(matched_list[:3]) or 'core areas'} closely matches the requirements."
+                if missing_list:
+                    career["reasoning"] += f" Learning {', '.join(missing_list[:2])} will make your profile even stronger."
+            elif career["score"] >= 40:
+                career["reasoning"] = f"Solid foundation for {career['title']}. Your skills in {', '.join(matched_list[:3]) or 'relevant tools'} provide a good start."
+                if missing_list:
+                    career["reasoning"] += f" Focus on {', '.join(missing_list[:2])} to bridge key gaps."
+            else:
+                career["reasoning"] = f"Emerging pathway for {career['title']}. Building {', '.join(missing_list[:3]) or 'foundational skills'} will help you qualify for this role."
+
+        return top_recommendations
 
     def get_career_details(self, career_id: str) -> dict[str, Any] | None:
         """Get detailed information about a specific career."""

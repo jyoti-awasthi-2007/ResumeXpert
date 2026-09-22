@@ -23,6 +23,17 @@ class AIProvider(ABC):
         pass
 
     @abstractmethod
+    def generate_mcqs_batch(
+        self,
+        skills: list[str],
+        difficulty: str,
+        count: int = 10,
+        career: str = "",
+    ) -> list[dict[str, Any]]:
+        """Generate multiple choice questions in a single batch request."""
+        pass
+
+    @abstractmethod
     def generate_question_explanation(
         self,
         question: str,
@@ -74,7 +85,7 @@ class OpenAIProvider(AIProvider):
         """Initialize OpenAI-compatible provider."""
         try:
             import openai
-            client_kwargs = {"api_key": settings.AI_API_KEY}
+            client_kwargs = {"api_key": settings.AI_API_KEY, "max_retries": max(1, settings.AI_MAX_RETRIES)}
             if settings.AI_BASE_URL:
                 client_kwargs["base_url"] = settings.AI_BASE_URL
             self.client = openai.OpenAI(**client_kwargs)
@@ -107,7 +118,8 @@ Return ONLY valid JSON in this exact format:
                 model=self.model,
                 messages=[{"role": "user", "content": prompt}],
                 temperature=0.7,
-                timeout=self.timeout,
+                max_tokens=350,
+                timeout=min(self.timeout, 8),
             )
             
             content = response.choices[0].message.content or ""
@@ -129,6 +141,64 @@ Return ONLY valid JSON in this exact format:
             logger.error(f"Error generating MCQ: {error}")
             return self._get_fallback_mcq(skill, difficulty)
 
+    def generate_mcqs_batch(
+        self,
+        skills: list[str],
+        difficulty: str,
+        count: int = 10,
+        career: str = "",
+    ) -> list[dict[str, Any]]:
+        """Generate multiple choice questions in a single batch request."""
+        target_skills = ", ".join(skills[:5]) if skills else "general technical concepts"
+        career_ctx = f" for the role of '{career}'" if career else ""
+        prompt = f"""Generate {count} unique multiple choice questions testing these skills: {target_skills} at {difficulty} level{career_ctx}.
+Return ONLY a valid JSON array of objects. No markdown code fences, no extra text.
+Each object must have:
+- "question": string
+- "options": array of exactly 4 distinct choices
+- "correct_answer": integer (0, 1, 2, or 3)
+- "skill": string (one of the tested skills)
+- "explanation": brief explanation"""
+
+        try:
+            response = self.client.chat.completions.create(
+                model=self.model,
+                messages=[{"role": "user", "content": prompt}],
+                temperature=0.5,
+                max_tokens=800,
+                timeout=min(self.timeout, 8),
+            )
+            content = response.choices[0].message.content or ""
+            content = content.strip().removeprefix("```json").removeprefix("```").removesuffix("```").strip()
+            if "[" in content and "]" in content:
+                content = content[content.find("["):content.rfind("]") + 1]
+            items = json.loads(content)
+            if not isinstance(items, list):
+                return []
+            valid_questions = []
+            for item in items:
+                options = item.get("options", [])
+                correct_answer = item.get("correct_answer", item.get("correct"))
+                if (
+                    item.get("question")
+                    and len(options) == 4
+                    and len(set(options)) == 4
+                    and isinstance(correct_answer, int)
+                    and 0 <= correct_answer < 4
+                ):
+                    valid_questions.append({
+                        "question": item["question"].strip(),
+                        "options": options,
+                        "correct": correct_answer,
+                        "correct_answer": correct_answer,
+                        "skill": item.get("skill") or (skills[0] if skills else "General"),
+                        "explanation": item.get("explanation", ""),
+                    })
+            return valid_questions
+        except Exception as error:
+            logger.warning(f"Batch MCQ generation failed: {error}")
+            return []
+
     def generate_question_explanation(
         self,
         question: str,
@@ -147,7 +217,8 @@ Keep explanation concise and educational."""
                 model=self.model,
                 messages=[{"role": "user", "content": prompt}],
                 temperature=0.5,
-                timeout=self.timeout,
+                max_tokens=200,
+                timeout=min(self.timeout, 6),
             )
             return response.choices[0].message.content
         except Exception as error:
@@ -177,8 +248,9 @@ Return ONLY valid JSON in this format:
             response = self.client.chat.completions.create(
                 model=self.model,
                 messages=[{"role": "user", "content": prompt}],
-                temperature=0.7,
-                timeout=self.timeout,
+                temperature=0.6,
+                max_tokens=450,
+                timeout=min(self.timeout, 8),
             )
             
             content = response.choices[0].message.content or ""
@@ -224,7 +296,8 @@ Keep response concise and motivating (2-3 sentences)."""
                 model=self.model,
                 messages=[{"role": "user", "content": prompt}],
                 temperature=0.7,
-                timeout=self.timeout,
+                max_tokens=200,
+                timeout=min(self.timeout, 6),
             )
             return response.choices[0].message.content
         except Exception as error:
@@ -254,7 +327,8 @@ Generate 3-5 recommendations with highest priority skills first."""
                 model=self.model,
                 messages=[{"role": "user", "content": prompt}],
                 temperature=0.7,
-                timeout=self.timeout,
+                max_tokens=400,
+                timeout=min(self.timeout, 8),
             )
             
             content = response.choices[0].message.content
@@ -286,7 +360,8 @@ User question: {message}"""
                     {"role": "user", "content": prompt},
                 ],
                 temperature=0.4,
-                timeout=self.timeout,
+                max_tokens=250,
+                timeout=min(self.timeout, 6),
             )
             return response.choices[0].message.content.strip()
         except Exception as error:
@@ -370,6 +445,16 @@ class FallbackAIProvider(AIProvider):
             "correct_answer": 0,
             "explanation": f"Foundation in {skill} fundamentals is essential.",
         }
+
+    def generate_mcqs_batch(
+        self,
+        skills: list[str],
+        difficulty: str,
+        count: int = 10,
+        career: str = "",
+    ) -> list[dict[str, Any]]:
+        """Fallback batch MCQ generation."""
+        return []
 
     def generate_question_explanation(
         self,
@@ -462,6 +547,16 @@ class AIService:
     ) -> dict[str, Any]:
         """Generate multiple choice question."""
         return self.provider.generate_mcq(skill, difficulty, context)
+
+    def generate_mcqs_batch(
+        self,
+        skills: list[str],
+        difficulty: str,
+        count: int = 10,
+        career: str = "",
+    ) -> list[dict[str, Any]]:
+        """Generate multiple choice questions in a single batch."""
+        return self.provider.generate_mcqs_batch(skills, difficulty, count, career)
 
     def generate_question_explanation(
         self,

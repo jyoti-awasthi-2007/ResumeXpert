@@ -27,7 +27,6 @@ const navItems = [
     { name: 'Skill Assessment', icon: Shield, path: '/assessment' },
     { name: 'Assessment Results', icon: BarChart3, path: '/assessment/results' },
     { name: 'Skill Confidence', icon: Sparkles, path: '/confidence' },
-    { name: 'Claim vs Actual', icon: Shield, path: '/claim-vs-actual' },
     { name: 'Career Readiness', icon: Layers, path: '/career-readiness' },
     { name: 'Analytics', icon: BarChart3, path: '/analytics' },
     { name: 'Profile', icon: User, path: '/profile' },

@@ -230,33 +230,33 @@ class AssessmentEngine:
         num_questions: int,
         career: str = "",
     ) -> list[dict[str, Any]]:
-        """Generate questions using AI."""
-        questions = []
-        
-        blocked = set()
-        for skill in skills[:5]:
-            attempts = max(2, (num_questions // max(len(skills[:5]), 1)) + 2)
-            for _ in range(attempts):
-                try:
-                    ai_question = ai_service.generate_mcq(skill, difficulty, f"Target career: {career}. Only test this skill: {skill}.")
-                    if "correct" not in ai_question and "correct_answer" in ai_question:
-                        ai_question["correct"] = ai_question["correct_answer"]
-                    question_text = ai_question.get("question", "").strip().lower()
-                    is_duplicate = any(
-                        SequenceMatcher(None, question_text, existing).ratio() >= 0.84
-                        for existing in blocked
-                    )
-                    if question_text and not is_duplicate:
-                        questions.append({**ai_question, "skill": skill})
-                        blocked.add(question_text)
-                except Exception as e:
-                    logger.warning(f"Error generating AI question: {e}")
-                if len(questions) >= num_questions:
+        """Generate questions using AI in a single fast batch request."""
+        try:
+            ai_questions = ai_service.generate_mcqs_batch(
+                skills=skills,
+                difficulty=difficulty,
+                count=num_questions,
+                career=career,
+            )
+            valid = []
+            blocked = set()
+            for q in ai_questions:
+                q_text = q.get("question", "").strip().lower()
+                if not q_text:
+                    continue
+                is_duplicate = any(
+                    SequenceMatcher(None, q_text, existing).ratio() >= 0.84
+                    for existing in blocked
+                )
+                if not is_duplicate:
+                    valid.append(q)
+                    blocked.add(q_text)
+                if len(valid) >= num_questions:
                     break
-            if len(questions) >= num_questions:
-                break
-        
-        return questions
+            return valid
+        except Exception as e:
+            logger.warning(f"Error generating AI questions in batch: {e}")
+            return []
 
     @staticmethod
     def _fallback_questions(skills: list[str], difficulty: str, count: int, blocked_questions: set[str]) -> list[dict[str, Any]]:

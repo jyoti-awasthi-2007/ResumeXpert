@@ -33,7 +33,6 @@ export default function DashboardLayout({ children, title }) {
         '/assessment': 'AI Career Skill Assessment',
         '/assessment/results': 'Assessment Results',
         '/confidence': 'Skill Confidence',
-        '/claim-vs-actual': 'Resume Claim vs Actual Skill',
         '/career-readiness': 'Career Readiness',
         '/analytics': 'Results & Analytics',
     })[location.pathname] || ''
