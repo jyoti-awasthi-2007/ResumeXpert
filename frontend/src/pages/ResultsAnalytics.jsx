@@ -13,7 +13,7 @@ export default function ResultsAnalytics() {
     const targetScore = metrics.career_readiness || 0
     const radarData = skills.slice(0, 6).map((skill) => ({
         skill: typeof skill === 'string' ? skill : skill.name,
-        value: Number(typeof skill === 'string' ? 70 : skill.confidence || 70),
+        value: Number(typeof skill === 'string' ? 0 : skill.confidence || 0),
     })).filter((item) => item.skill)
     const summaryData = [
         { label: 'Resume Score', value: metrics.resume_score, color: '#0b83c9', icon: FileText },
@@ -24,17 +24,20 @@ export default function ResultsAnalytics() {
     const barData = summaryData.map(({ label, value }) => ({ name: label.replace(' Score', ''), score: value || 0 }))
 
     useEffect(() => {
+        if (targetScore === 0) return
         const duration = 2000
         const start = Date.now()
+        const frameId = { current: null }
         const animate = () => {
             const elapsed = Date.now() - start
             const progress = Math.min(elapsed / duration, 1)
             const eased = 1 - Math.pow(1 - progress, 3)
             setTrustScore(Math.round(eased * targetScore))
-            if (progress < 1) requestAnimationFrame(animate)
+            if (progress < 1) frameId.current = requestAnimationFrame(animate)
         }
-        animate()
-    }, [])
+        frameId.current = requestAnimationFrame(animate)
+        return () => cancelAnimationFrame(frameId.current)
+    }, [targetScore])
 
     return (
         <PageTransition>

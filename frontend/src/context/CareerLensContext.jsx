@@ -204,10 +204,11 @@ export function CareerLensProvider({ children }) {
     const resumeScore = Number(resumeState.analysis?.score || analyticsOverviewState.main?.resume_score || 0)
     const skillMatch = Number(selectedCareer?.score || skillGap.overallMatch || analyticsOverviewState.main?.career_match || 0)
     const assessmentScore = Number(assessmentResult?.score ?? profile?.assessment_result?.score ?? analyticsOverviewState.main?.assessment_score ?? 0)
+    // Confidence only comes from a completed assessment — never from the fluctuating /confidence API
     const confidenceScore = Number(
       typeof profile?.confidence === 'number'
         ? profile.confidence
-        : (assessmentResult?.score ?? (confidence > 0 ? confidence : 0) ?? analyticsOverviewState.main?.confidence_score ?? 0)
+        : (assessmentResult?.score ?? profile?.assessment_result?.score ?? 0)
     )
     const scoredValues = [resumeScore, skillMatch, assessmentScore, confidenceScore].filter((value) => value > 0)
     const careerReadiness = scoredValues.length ? Math.round(scoredValues.reduce((sum, value) => sum + value, 0) / scoredValues.length) : 0
@@ -223,16 +224,17 @@ export function CareerLensProvider({ children }) {
       career_readiness: careerReadiness,
       career_readiness_score: careerReadiness,
     }
-  }, [analyticsOverviewState.main, assessmentResult?.score, confidence, profile?.assessment_result?.score, profile?.confidence, resumeState.analysis?.score, selectedCareer?.score, skillGap.missingSkills.length, skillGap.overallMatch, skills.length])
+  }, [analyticsOverviewState.main, assessmentResult?.score, profile?.assessment_result?.score, profile?.confidence, resumeState.analysis?.score, selectedCareer?.score, skillGap.missingSkills.length, skillGap.overallMatch, skills.length])
 
   const readinessOverview = useMemo(() => {
     const resumeQuality = Number(resumeState.analysis?.score || readinessOverviewState.breakdown?.resume_quality || 0)
     const skillMatch = Number(selectedCareer?.score || skillGap.overallMatch || readinessOverviewState.breakdown?.skill_match || 0)
     const assessmentScore = Number(assessmentResult?.score ?? profile?.assessment_result?.score ?? readinessOverviewState.breakdown?.assessment_score ?? 0)
+    // Confidence only comes from a completed assessment — never from the fluctuating /confidence API
     const confidenceScore = Number(
       typeof profile?.confidence === 'number'
         ? profile.confidence
-        : (assessmentResult?.score ?? (confidence > 0 ? confidence : 0) ?? readinessOverviewState.breakdown?.confidence ?? 0)
+        : (assessmentResult?.score ?? profile?.assessment_result?.score ?? 0)
     )
 
     const breakdown = {
@@ -253,7 +255,7 @@ export function CareerLensProvider({ children }) {
       strengths: readinessOverviewState.strengths?.length ? readinessOverviewState.strengths : ['Resume processed successfully', 'Core technical qualifications identified'],
       improvements: readinessOverviewState.improvements?.length ? readinessOverviewState.improvements : ['Complete skill assessment to validate your qualifications', 'Focus on priority skills for your target career'],
     }
-  }, [assessmentResult?.score, confidence, profile?.assessment_result?.score, profile?.confidence, readinessOverviewState, resumeState.analysis?.score, selectedCareer?.score, skillGap.overallMatch])
+  }, [assessmentResult?.score, profile?.assessment_result?.score, profile?.confidence, readinessOverviewState, resumeState.analysis?.score, selectedCareer?.score, skillGap.overallMatch])
 
   const nlpProcessing = useMemo(() => {
     const isAnalyzed = Boolean(resumeState.analysis)

@@ -32,8 +32,19 @@ class ResumeService:
         self.upload_dir = settings.UPLOAD_DIR
         self.upload_dir.mkdir(parents=True, exist_ok=True)
         self.analysis_engine = ResumeAnalysisEngine()
-        self.resume_store = {}  # In-memory store (can be replaced with DB)
+        self.store_path = self.upload_dir / "resumes.json"
+        try:
+            self.resume_store = json.loads(self.store_path.read_text(encoding="utf-8")) if self.store_path.exists() else {}
+        except (OSError, json.JSONDecodeError):
+            self.resume_store = {}
         self._initialized = True
+
+    def _save_store(self) -> None:
+        """Persist resumes to file store."""
+        try:
+            self.store_path.write_text(json.dumps(self.resume_store), encoding="utf-8")
+        except Exception as e:
+            logger.warning(f"Could not persist resume store: {e}")
 
     async def upload_resume(
         self,
@@ -105,6 +116,7 @@ class ResumeService:
             "status": "uploaded",
             "analysis": None,
         }
+        self._save_store()
         
         logger.info(f"Resume {resume_id} uploaded successfully")
         
@@ -157,6 +169,7 @@ class ResumeService:
             # Store analysis
             self.resume_store[resume_id]["analysis"] = analysis
             self.resume_store[resume_id]["status"] = "analyzed"
+            self._save_store()
             
             logger.info(f"Resume {resume_id} analyzed successfully")
             

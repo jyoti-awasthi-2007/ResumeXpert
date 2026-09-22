@@ -20,12 +20,15 @@ resume_service = ResumeService()
 def _resolve_user_skills(request: dict[str, Any]) -> list[str]:
     """Resolve user skills from either direct payloads or resume_id."""
     if request.get("user_skills"):
-        return [str(skill) for skill in request["user_skills"]]
+        return [str(skill) for skill in request["user_skills"] if skill]
 
     resume_id = request.get("resume_id")
     if resume_id:
-        analysis = resume_service.get_resume_analysis(resume_id)
-        return [str(skill["name"]) for skill in analysis.get("skills", [])]
+        try:
+            analysis = resume_service.get_resume_analysis(resume_id)
+            return [str(skill["name"]) for skill in analysis.get("skills", []) if isinstance(skill, dict) and skill.get("name")]
+        except Exception:
+            pass
 
     return []
 
@@ -37,8 +40,11 @@ def _resolve_required_skills(request: dict[str, Any]) -> list[str]:
 
     career_id = request.get("career_id")
     if career_id:
-        career = career_service.get_career_details(career_id)
-        return [str(skill) for skill in career.get("required_skills", [])]
+        try:
+            career = career_service.get_career_details(career_id)
+            return [str(skill) for skill in career.get("required_skills", [])]
+        except Exception:
+            pass
 
     return []
 
@@ -50,8 +56,11 @@ def _resolve_career_path(request: dict[str, Any]) -> str:
 
     career_id = request.get("career_id")
     if career_id:
-        career = career_service.get_career_details(career_id)
-        return str(career.get("title", ""))
+        try:
+            career = career_service.get_career_details(career_id)
+            return str(career.get("title", ""))
+        except Exception:
+            pass
 
     return ""
 
@@ -72,8 +81,8 @@ async def analyze_skill_gap(request: dict[str, Any]) -> dict[str, Any]:
         required_skills = _resolve_required_skills(request)
         career_path = _resolve_career_path(request)
 
-        if not user_skills or not required_skills:
-            return {"code": "INVALID_REQUEST", "message": "user skills and career requirements are required"}
+        if not required_skills:
+            return {"code": "INVALID_REQUEST", "message": "career requirements are required"}
 
         gap_analysis = gap_service.analyze_gap(user_skills, required_skills)
 
@@ -109,8 +118,8 @@ async def get_skill_recommendations(request: dict[str, Any]) -> dict[str, Any]:
                 return {"code": "INVALID_REQUEST", "message": "career requirements are required"}
             missing_skills = gap_service.analyze_gap(user_skills, required_skills).get("missing_skills", [])
 
-        if not user_skills or not missing_skills or not career_path:
-            return {"code": "INVALID_REQUEST", "message": "resume skills, missing skills, and career path are required"}
+        if not missing_skills or not career_path:
+            return {"code": "INVALID_REQUEST", "message": "missing skills and career path are required"}
 
         recommendations = recommendation_service.generate_recommendations(
             missing_skills,
