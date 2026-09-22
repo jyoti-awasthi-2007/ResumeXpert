@@ -18,10 +18,9 @@ class Settings(BaseSettings):
     DATABASE_URL: str | None = os.getenv("DATABASE_URL")
 
     # File uploads
-    UPLOAD_DIR: Path = Path(os.getenv(
-        "UPLOAD_DIR",
-        Path(__file__).resolve().parents[1] / "uploads"
-    ))
+    UPLOAD_DIR: Path = (
+        Path(__file__).resolve().parents[1] / os.getenv("UPLOAD_DIR", "uploads").replace("./", "")
+    ).resolve()
     MAX_UPLOAD_SIZE_MB: int = int(os.getenv("MAX_UPLOAD_SIZE_MB", "10"))
     MAX_UPLOAD_BYTES: int = MAX_UPLOAD_SIZE_MB * 1024 * 1024
 

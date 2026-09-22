@@ -72,9 +72,14 @@ class ResumeAnalysisEngine:
         education = self._extract_education(sections)
         experience = self._extract_experience(sections)
         projects = self._extract_projects(sections)
+        strengths = ai_analysis.get("strengths", []) or [
+            "Resume structure is clear and well organized",
+            "Core technical skills are listed",
+        ]
         weaknesses = ai_analysis.get("weaknesses", []) or [
-            "Could include more quantifiable metrics",
-            "Missing specific project examples",
+            "Quantify achievements with measurable metrics (e.g., percentages, project scope)",
+            "Include specific project examples and technical responsibilities",
+            "Add cloud or modern framework experience to broaden skill coverage",
         ]
         impressions = ai_analysis.get("recommendations", []) or [
             "Add measurable outcomes to achievements",
@@ -97,9 +102,9 @@ class ResumeAnalysisEngine:
             "education": education,
             "experience": experience,
             "projects": projects,
-            "strengths": ai_analysis.get("strengths", []),
+            "strengths": strengths,
             "weaknesses": weaknesses,
-            "improvements": ai_analysis.get("weaknesses", []) or weaknesses,
+            "improvements": ai_analysis.get("improvements", []) or weaknesses,
             "recommendations": impressions,
             "skills": skills,
             "sections": {

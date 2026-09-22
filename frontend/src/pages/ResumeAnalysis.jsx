@@ -71,24 +71,30 @@ export default function ResumeAnalysis() {
               <div className="bg-surface p-6 rounded-2xl border" style={{ borderColor: 'var(--color-border)' }}>
                 <h2 className="text-lg font-semibold text-primary mb-4">Resume Strengths</h2>
                 <div className="space-y-3">
-                  {resume.strengths.map((item) => (
-                    <div key={item} className="flex items-start gap-3 text-primary">
-                      <CheckCircle2 size={18} className="text-success mt-1" />
-                      <p className="text-sm text-primary">{item}</p>
-                    </div>
-                  ))}
+                  {(resume.strengths || []).map((item) => {
+                    const cleanItem = typeof item === 'string' ? item.replace(/^[~*\s\-\d.]+/, '').replace(/[~*]/g, '').trim() : String(item)
+                    return (
+                      <div key={cleanItem} className="flex items-start gap-3 text-primary">
+                        <CheckCircle2 size={18} className="text-success flex-shrink-0 mt-0.5" />
+                        <p className="text-sm text-primary leading-snug">{cleanItem}</p>
+                      </div>
+                    )
+                  })}
                 </div>
               </div>
 
               <div className="bg-surface p-6 rounded-2xl border" style={{ borderColor: 'var(--color-border)' }}>
                 <h2 className="text-lg font-semibold text-primary mb-4">Areas to Improve</h2>
                 <div className="space-y-3">
-                  {resume.improvements.map((item) => (
-                    <div key={item} className="flex items-start gap-3 text-primary">
-                      <AlertTriangle size={18} className="text-warning mt-1" />
-                      <p className="text-sm text-primary">{item}</p>
-                    </div>
-                  ))}
+                  {(resume.improvements || resume.weaknesses || []).map((item) => {
+                    const cleanItem = typeof item === 'string' ? item.replace(/^[~*\s\-\d.]+/, '').replace(/[~*]/g, '').trim() : String(item)
+                    return (
+                      <div key={cleanItem} className="flex items-start gap-3 text-primary">
+                        <AlertTriangle size={18} className="text-warning flex-shrink-0 mt-0.5" />
+                        <p className="text-sm text-primary leading-snug">{cleanItem}</p>
+                      </div>
+                    )
+                  })}
                 </div>
               </div>
             </div>

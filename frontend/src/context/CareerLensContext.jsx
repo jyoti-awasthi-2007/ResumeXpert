@@ -1,17 +1,24 @@
-import { createContext, useCallback, useContext, useEffect, useMemo, useState } from 'react'
+import { createContext, useCallback, useContext, useEffect, useMemo, useRef, useState } from 'react'
 import { apiError } from '../services/api'
 import api from '../services/api'
 import { uploadResume as uploadResumeRequest, analyzeResume } from '../services/resumeService'
 import { getCareers, recommendCareers } from '../services/careerService'
 import { generateAssessment, submitAssessment as submitAssessmentRequest, getAssessmentResult } from '../services/assessmentService'
 import { useAuth } from './AuthContext'
-import {
-  nlpProcessing,
-  assessmentLevels,
-  confidenceLevels,
-  nextSteps,
-  analyticsOverview,
-} from '../data/mockData'
+export const assessmentLevels = [
+  { id: 'beginner', title: 'Beginner Level', questions: 10, time: '15 min' },
+  { id: 'intermediate', title: 'Intermediate Level', questions: 10, time: '20 min' },
+  { id: 'advanced', title: 'Advanced Level', questions: 10, time: '25 min' },
+  { id: 'expert', title: 'Expert Level', questions: 10, time: '30 min' },
+]
+
+export const confidenceLevels = [
+  { range: '0–40', label: 'Low Confidence', color: 'danger' },
+  { range: '41–60', label: 'Developing', color: 'warning' },
+  { range: '61–75', label: 'Good', color: 'accent' },
+  { range: '76–90', label: 'High', color: 'primary' },
+  { range: '91–100', label: 'Expert Confidence', color: 'success' },
+]
 
 const CareerLensContext = createContext(null)
 
@@ -70,20 +77,50 @@ export function CareerLensProvider({ children }) {
   const [analyticsOverviewState, setAnalyticsOverview] = useState({ main: {} })
   const [error, setError] = useState('')
 
+  const lastAnalyzedKeyRef = useRef('')
+  const lastSkillsKeyRef = useRef('')
+
   useEffect(() => {
     if (!profile) return
     const savedSkills = Array.isArray(profile.skills) && profile.skills.length
       ? profile.skills
       : profile.resume_state?.analysis?.skills || []
-    setSkills(savedSkills.map((skill) => typeof skill === 'string' ? { id: skill.toLowerCase().replace(/\s+/g, '-'), name: skill, category: 'Skills', confidence: 0 } : skill))
-    if (profile.resume_state) setResumeState(profile.resume_state)
-    if (profile.selected_career_id) setSelectedCareerId(profile.selected_career_id)
-    if (profile.skill_gap) setSkillGap(normalizeSkillGap(profile.skill_gap))
-    if (Array.isArray(profile.recommendations)) setRecommendations(profile.recommendations)
-    if (profile.assessment_result) setAssessmentResult(normalizeAssessmentResult(profile.assessment_result))
-    if (typeof profile.confidence === 'number') setConfidence(profile.confidence)
+
+    setSkills((prev) => {
+      const prevNames = prev.map((s) => s.name).sort().join(',')
+      const nextNames = savedSkills.map((s) => typeof s === 'string' ? s : s.name).sort().join(',')
+      if (prevNames === nextNames && prev.length > 0) return prev
+      return savedSkills.map((skill) => typeof skill === 'string' ? { id: skill.toLowerCase().replace(/\s+/g, '-'), name: skill, category: 'Skills', confidence: 0 } : skill)
+    })
+
+    if (profile.resume_state && profile.resume_state.id) {
+      setResumeState((prev) => (prev.id === profile.resume_state.id && prev.uploaded === profile.resume_state.uploaded ? prev : profile.resume_state))
+    }
+    if (profile.selected_career_id) {
+      setSelectedCareerId((prev) => (prev === profile.selected_career_id ? prev : profile.selected_career_id))
+    }
+    if (profile.skill_gap) {
+      setSkillGap((prev) => (prev.overallMatch === profile.skill_gap.overallMatch && prev.missingSkills?.length === profile.skill_gap.missingSkills?.length ? prev : normalizeSkillGap(profile.skill_gap)))
+    }
+    if (Array.isArray(profile.recommendations) && profile.recommendations.length > 0) {
+      setRecommendations((prev) => (prev.length === profile.recommendations.length ? prev : profile.recommendations))
+    }
+    if (profile.assessment_result) {
+      setAssessmentResult((prev) => {
+        if (prev && prev.score === profile.assessment_result.score && prev.status === profile.assessment_result.status) {
+          return prev
+        }
+        return normalizeAssessmentResult(profile.assessment_result)
+      })
+    }
+    if (typeof profile.confidence === 'number') {
+      setConfidence((prev) => (prev === profile.confidence ? prev : profile.confidence))
+    }
+
     const savedSkillNames = savedSkills.map((skill) => typeof skill === 'string' ? skill : skill.name).filter(Boolean)
-    if (savedSkillNames.length) {
+    const skillsKey = savedSkillNames.sort().join(',')
+    if (savedSkillNames.length && skillsKey !== lastSkillsKeyRef.current) {
+      lastSkillsKeyRef.current = skillsKey
       recommendCareers(savedSkillNames).then((items) => {
         const normalized = Array.isArray(items) ? items.map(normalizeCareerMatch) : []
         if (normalized.length) setCareerMatches(normalized)
@@ -106,26 +143,46 @@ export function CareerLensProvider({ children }) {
   useEffect(() => {
     if (!resumeState.id) return
     if (!selectedCareerId) return
-    const request = { resume_id: resumeState.id, career_id: selectedCareerId }
+
+    const currentKey = `${resumeState.id}_${selectedCareerId}`
+    if (lastAnalyzedKeyRef.current === currentKey) return
+    lastAnalyzedKeyRef.current = currentKey
+
+    const effectiveUserId = authUser?.id || profile?.id || 'demo-user'
+    const request = { resume_id: resumeState.id, career_id: selectedCareerId, user_id: effectiveUserId }
     Promise.all([
       api.post('/skill-gap/analyze', request),
       api.post('/recommendations/skills', request),
-      api.get('/confidence/demo-user'),
-      api.get('/skills/claim-vs-actual/demo-user'),
-      api.get('/career-readiness/demo-user'),
-      api.get('/analytics/dashboard/demo-user'),
+      api.get(`/confidence/${effectiveUserId}`),
+      api.get(`/skills/claim-vs-actual/${effectiveUserId}`),
+      api.get(`/career-readiness/${effectiveUserId}`),
+      api.get(`/analytics/dashboard/${effectiveUserId}`),
     ]).then(([gap, skillsResult, confidenceResult, claimsResult, readinessResult, analyticsResult]) => {
       const nextSkillGap = normalizeSkillGap(gap.data)
       const nextRecommendations = Array.isArray(skillsResult.data?.recommendations) ? skillsResult.data.recommendations.map(normalizeRecommendation) : Array.isArray(skillsResult.data) ? skillsResult.data.map(normalizeRecommendation) : []
       setSkillGap(nextSkillGap)
       setRecommendations(nextRecommendations)
-      setConfidence(confidenceResult.data[0]?.confidence_score || 0)
-      setClaimComparison(claimsResult.data)
+
+      // Only set demo confidence if no real assessment/profile confidence exists
+      setConfidence((current) => {
+        if (typeof profile?.confidence === 'number') return profile.confidence
+        if (assessmentResult?.score != null) return assessmentResult.score
+        if (current > 0) return current
+        return confidenceResult.data?.[0]?.confidence_score || 0
+      })
+
+      setClaimComparison(Array.isArray(claimsResult.data) ? claimsResult.data : [])
+
+      const activeConfidence = typeof profile?.confidence === 'number'
+        ? profile.confidence
+        : (assessmentResult?.score != null ? assessmentResult.score : (confidenceResult.data?.[0]?.confidence_score || 0))
+      const activeAssessment = Number(assessmentResult?.score ?? profile?.assessment_result?.score ?? 0)
+
       const readinessBreakdown = {
         resume_quality: Number(resumeState.analysis?.score || 0),
         skill_match: Number(selectedCareer?.score || nextSkillGap.overallMatch || 0),
-        assessment_score: Number(assessmentResult?.score || 0),
-        confidence: Number(confidence || 0),
+        assessment_score: activeAssessment,
+        confidence: activeConfidence,
       }
       const readinessValues = Object.values(readinessBreakdown).filter((value) => value > 0)
       setReadinessOverview({
@@ -135,9 +192,8 @@ export function CareerLensProvider({ children }) {
         breakdown: readinessBreakdown,
       })
       setAnalyticsOverview({ ...analyticsOverviewState, main: analyticsResult.data })
-      saveProgress({ skill_gap: nextSkillGap, recommendations: nextRecommendations }).catch(() => {})
     }).catch(() => {})
-  }, [resumeState.id, selectedCareerId, assessmentResult])
+  }, [authUser?.id, profile?.id, resumeState.id, selectedCareerId])
 
   const selectedCareer = useMemo(
     () => careerMatches.find((item) => item.id === selectedCareerId) || careerMatches[0],
@@ -147,8 +203,12 @@ export function CareerLensProvider({ children }) {
   const analyticsMain = useMemo(() => {
     const resumeScore = Number(resumeState.analysis?.score || analyticsOverviewState.main?.resume_score || 0)
     const skillMatch = Number(selectedCareer?.score || skillGap.overallMatch || analyticsOverviewState.main?.career_match || 0)
-    const assessmentScore = Number(assessmentResult?.score || analyticsOverviewState.main?.assessment_score || 0)
-    const confidenceScore = Number(confidence || analyticsOverviewState.main?.confidence_score || 0)
+    const assessmentScore = Number(assessmentResult?.score ?? profile?.assessment_result?.score ?? analyticsOverviewState.main?.assessment_score ?? 0)
+    const confidenceScore = Number(
+      typeof profile?.confidence === 'number'
+        ? profile.confidence
+        : (assessmentResult?.score ?? (confidence > 0 ? confidence : 0) ?? analyticsOverviewState.main?.confidence_score ?? 0)
+    )
     const scoredValues = [resumeScore, skillMatch, assessmentScore, confidenceScore].filter((value) => value > 0)
     const careerReadiness = scoredValues.length ? Math.round(scoredValues.reduce((sum, value) => sum + value, 0) / scoredValues.length) : 0
 
@@ -163,7 +223,100 @@ export function CareerLensProvider({ children }) {
       career_readiness: careerReadiness,
       career_readiness_score: careerReadiness,
     }
-  }, [analyticsOverviewState.main, assessmentResult, confidence, resumeState.analysis, selectedCareer, skillGap, skills.length])
+  }, [analyticsOverviewState.main, assessmentResult?.score, confidence, profile?.assessment_result?.score, profile?.confidence, resumeState.analysis?.score, selectedCareer?.score, skillGap.missingSkills.length, skillGap.overallMatch, skills.length])
+
+  const readinessOverview = useMemo(() => {
+    const resumeQuality = Number(resumeState.analysis?.score || readinessOverviewState.breakdown?.resume_quality || 0)
+    const skillMatch = Number(selectedCareer?.score || skillGap.overallMatch || readinessOverviewState.breakdown?.skill_match || 0)
+    const assessmentScore = Number(assessmentResult?.score ?? profile?.assessment_result?.score ?? readinessOverviewState.breakdown?.assessment_score ?? 0)
+    const confidenceScore = Number(
+      typeof profile?.confidence === 'number'
+        ? profile.confidence
+        : (assessmentResult?.score ?? (confidence > 0 ? confidence : 0) ?? readinessOverviewState.breakdown?.confidence ?? 0)
+    )
+
+    const breakdown = {
+      resumeQuality,
+      skillMatch,
+      assessment: assessmentScore,
+      confidence: confidenceScore,
+    }
+
+    const scoredValues = [resumeQuality, skillMatch, assessmentScore, confidenceScore].filter((v) => v > 0)
+    const score = scoredValues.length ? Math.round(scoredValues.reduce((sum, v) => sum + v, 0) / scoredValues.length) : 0
+
+    return {
+      ...readinessOverviewState,
+      score: score || readinessOverviewState.score || 0,
+      status: readinessOverviewState.status || 'Good Preparation',
+      breakdown,
+      strengths: readinessOverviewState.strengths?.length ? readinessOverviewState.strengths : ['Resume processed successfully', 'Core technical qualifications identified'],
+      improvements: readinessOverviewState.improvements?.length ? readinessOverviewState.improvements : ['Complete skill assessment to validate your qualifications', 'Focus on priority skills for your target career'],
+    }
+  }, [assessmentResult?.score, confidence, profile?.assessment_result?.score, profile?.confidence, readinessOverviewState, resumeState.analysis?.score, selectedCareer?.score, skillGap.overallMatch])
+
+  const nlpProcessing = useMemo(() => {
+    const isAnalyzed = Boolean(resumeState.analysis)
+    const skillsCount = resumeState.analysis?.skills?.length || 0
+    const sectionsCount = Object.keys(resumeState.analysis?.sections || {}).length
+    return [
+      { label: 'Text Extraction', status: isAnalyzed ? 'Complete' : 'Pending' },
+      { label: 'Section Detection', status: isAnalyzed ? (sectionsCount ? `Complete (${sectionsCount} sections)` : 'Complete') : 'Pending' },
+      { label: 'Entity Recognition', status: isAnalyzed ? 'Complete' : 'Pending' },
+      { label: 'Skill Extraction', status: isAnalyzed ? (skillsCount ? `Complete (${skillsCount} skills)` : 'Complete') : 'Pending' },
+      { label: 'Skill Normalization', status: isAnalyzed ? 'Complete' : 'Pending' },
+      { label: 'Career Mapping', status: selectedCareer?.title ? `Complete (${selectedCareer.title})` : (isAnalyzed ? 'Complete' : 'Pending') },
+    ]
+  }, [resumeState.analysis, selectedCareer?.title])
+
+  const nextSteps = useMemo(() => {
+    if (recommendations && recommendations.length > 0) {
+      return recommendations.slice(0, 4).map((rec) => ({
+        title: `Learn ${rec.skill}`,
+        reason: rec.reason || rec.why || `Key skill for ${selectedCareer?.title || 'your target career'}.`,
+        action: 'View Recommendations',
+        link: '/recommendations',
+      }))
+    }
+    if (skillGap?.missingSkills && skillGap.missingSkills.length > 0) {
+      return skillGap.missingSkills.slice(0, 4).map((skill) => ({
+        title: `Develop ${skill}`,
+        reason: `Required skill for ${selectedCareer?.title || 'your target career'}.`,
+        action: 'View Skill Gap',
+        link: '/skill-gap',
+      }))
+    }
+    if (resumeState.uploaded) {
+      return [
+        {
+          title: 'Take Skill Assessment',
+          reason: 'Test your practical knowledge and earn validated confidence scores.',
+          action: 'Start Assessment',
+          link: '/assessment',
+        },
+        {
+          title: 'Explore Career Suggestions',
+          reason: 'Discover role opportunities matched to your extracted skills.',
+          action: 'View Careers',
+          link: '/career-suggestions',
+        },
+      ]
+    }
+    return [
+      {
+        title: 'Upload Your Resume',
+        reason: 'Get started with AI parsing, skill extraction, and career readiness scoring.',
+        action: 'Upload Resume',
+        link: '/upload-resume',
+      },
+    ]
+  }, [recommendations, resumeState.uploaded, selectedCareer?.title, skillGap?.missingSkills])
+
+  const user = useMemo(() => ({
+    name: profile?.full_name || authUser?.user_metadata?.full_name || authUser?.email?.split('@')[0] || '',
+    email: profile?.email || authUser?.email || '',
+    title: selectedCareer?.title || profile?.title || '',
+  }), [authUser, profile, selectedCareer?.title])
 
   const uploadResume = async (file) => {
     setError('')
@@ -203,7 +356,7 @@ export function CareerLensProvider({ children }) {
       return analysis
     } catch (requestError) {
       setError(apiError(requestError))
-      setResumeState({ uploaded: false, processing: false, analysis: null, id: null })
+      setResumeState({ uploaded: false, processing: false, analysis, id: null })
       throw requestError
     }
   }
@@ -239,7 +392,7 @@ export function CareerLensProvider({ children }) {
   }, [])
 
   const value = {
-    user: { name: '', email: '', title: '' },
+    user,
     resumeState,
     nlpProcessing,
     skills,
@@ -252,7 +405,7 @@ export function CareerLensProvider({ children }) {
     claimComparison: claimComparisonState,
     confidence,
     confidenceLevels,
-    readinessOverview: readinessOverviewState,
+    readinessOverview,
     nextSteps,
     analyticsOverview: { ...analyticsOverviewState, main: analyticsMain },
     uploadResume,

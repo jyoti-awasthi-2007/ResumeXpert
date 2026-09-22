@@ -181,15 +181,29 @@ Return ONLY valid JSON in this format:
                 timeout=self.timeout,
             )
             
-            content = response.choices[0].message.content
+            content = response.choices[0].message.content or ""
+            content = content.strip()
+            if content.startswith("```"):
+                content = content.split("```")[1]
+                if content.startswith("json"):
+                    content = content[4:]
+                content = content.strip()
+
             result = json.loads(content)
             return result
         except Exception as error:
             logger.error(f"Error analyzing resume: {error}")
             return {
-                "strengths": ["Resume structure is clear"],
-                "weaknesses": ["Could add more specific metrics"],
-                "recommendations": ["Use quantifiable achievements"],
+                "strengths": ["Resume structure is clear and organized"],
+                "weaknesses": [
+                    "Quantify achievements with measurable metrics (e.g., percentages, project scope)",
+                    "Include specific project examples and technical responsibilities",
+                    "Add cloud or modern framework experience to broaden skill coverage",
+                ],
+                "recommendations": [
+                    "Use quantifiable achievements in experience bullet points",
+                    "Highlight technical tools and project outcomes clearly",
+                ],
             }
 
     def generate_career_reasoning(

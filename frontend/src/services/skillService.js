@@ -1,7 +1,10 @@
-import { skills } from '../data/mockData'
+import api from './api'
 
-export function getSkills() {
-  return new Promise((resolve) => {
-    setTimeout(() => resolve(skills), 700)
-  })
+export async function getSkills() {
+  try {
+    const response = await api.get('/skills')
+    return response.data || []
+  } catch {
+    return []
+  }
 }
