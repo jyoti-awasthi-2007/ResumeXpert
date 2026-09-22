@@ -29,7 +29,7 @@ class ResumeService:
         if hasattr(self, "_initialized") and self._initialized:
             return
 
-        self.upload_dir = settings.UPLOAD_DIR
+        self.upload_dir = settings.get_upload_dir()
         self.upload_dir.mkdir(parents=True, exist_ok=True)
         self.analysis_engine = ResumeAnalysisEngine()
         self.store_path = self.upload_dir / "resumes.json"

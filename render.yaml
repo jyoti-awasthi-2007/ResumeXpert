@@ -21,7 +21,7 @@ services:
       - key: AI_MODEL
         sync: false
       - key: FRONTEND_URL
-        value: https://resume-xpert-7fdxq4b1r-jyoti-works.vercel.app
+        value: "https://resume-xpert-zeta.vercel.app,https://resume-xpert-7fdxq4b1r-jyoti-works.vercel.app"
       - key: DATABASE_URL
         sync: false
       - key: UPLOAD_DIR

@@ -18,11 +18,21 @@ class Settings(BaseSettings):
     DATABASE_URL: str | None = os.getenv("DATABASE_URL")
 
     # File uploads
-    UPLOAD_DIR: Path = (
-        Path(__file__).resolve().parents[1] / os.getenv("UPLOAD_DIR", "uploads").replace("./", "")
-    ).resolve()
+    # On Render/production, UPLOAD_DIR env var is an absolute path like /tmp/resumexpert-uploads.
+    # On local dev, it is relative (./uploads or uploads) and resolves to backend/uploads.
+    UPLOAD_DIR: str = os.getenv("UPLOAD_DIR", "uploads")
     MAX_UPLOAD_SIZE_MB: int = int(os.getenv("MAX_UPLOAD_SIZE_MB", "10"))
     MAX_UPLOAD_BYTES: int = MAX_UPLOAD_SIZE_MB * 1024 * 1024
+
+    def get_upload_dir(self) -> Path:
+        """Return the resolved upload directory as a Path object."""
+        raw = self.UPLOAD_DIR.replace("./", "")
+        path = Path(raw)
+        if path.is_absolute():
+            return path.resolve()
+        return (Path(__file__).resolve().parents[1] / raw).resolve()
+
+
 
     # Frontend
     FRONTEND_URL: str = os.getenv("FRONTEND_URL", "http://localhost:5173")

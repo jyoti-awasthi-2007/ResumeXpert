@@ -16,7 +16,7 @@ class AssessmentService:
     def __init__(self):
         """Initialize assessment service."""
         self.engine = AssessmentEngine()
-        self.store_path = settings.UPLOAD_DIR / "assessments.json"
+        self.store_path = settings.get_upload_dir() / "assessments.json"
         self.store_path.parent.mkdir(parents=True, exist_ok=True)
         try:
             self.assessments = json.loads(self.store_path.read_text(encoding="utf-8")) if self.store_path.exists() else {}

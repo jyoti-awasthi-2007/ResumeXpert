@@ -76,7 +76,7 @@ async def startup_event():
     logger.info("CareerLens Backend API starting up")
     logger.info(f"Frontend URL: {settings.FRONTEND_URL}")
     logger.info(f"AI Provider: {settings.AI_PROVIDER}")
-    logger.info(f"Upload Directory: {settings.UPLOAD_DIR}")
+    logger.info(f"Upload Directory: {settings.get_upload_dir()}")
 
 
 @app.on_event("shutdown")
