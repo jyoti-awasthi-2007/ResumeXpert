@@ -236,10 +236,12 @@
   .chatbot-list-marker { display: grid; place-items: center; flex: 0 0 auto; width: 17px; height: 17px; margin-top: 1px; border-radius: 6px; color: #0aa979; background: #dff8ec; font-size: 9px; font-weight: 700; }
   .chatbot-message-numbered .chatbot-list-marker { color: #0878c9; background: #e3f2ff; }
   .chatbot-table-wrap { max-width: 100%; overflow-x: auto; margin: 4px 0; border: 1px solid #dcecf2; border-radius: 9px; }
-  .chatbot-table { width: 100%; min-width: 260px; border-collapse: collapse; font-size: 10px; }
-  .chatbot-table th { padding: 7px 8px; color: #0878c9; background: #eaf8fc; font-size: 9px; font-weight: 700; text-align: left; white-space: nowrap; }
-  .chatbot-table td { padding: 7px 8px; border-top: 1px solid #edf3f5; color: #526f83; vertical-align: top; }
+  .chatbot-table { width: 100%; min-width: 260px; border-collapse: collapse; font-size: 11px; }
+  .chatbot-table th { padding: 8px 10px; color: #0878c9; background: #eaf8fc; font-size: 10px; font-weight: 700; text-align: left; white-space: nowrap; }
+  .chatbot-table td { padding: 8px 10px; border-top: 1px solid #edf3f5; color: #526f83; vertical-align: top; }
   .chatbot-table tr:nth-child(even) td { background: #fbfdfe; }
+  .no-scrollbar::-webkit-scrollbar { display: none; }
+  .no-scrollbar { -ms-overflow-style: none; scrollbar-width: none; }
 
   .auth-page { position: relative; background: linear-gradient(135deg, #f5fbff 0%, #fffaf6 52%, #f3fbff 100%); }
   .auth-page::before, .auth-page::after { content: ''; position: fixed; pointer-events: none; border-radius: 50%; filter: blur(4px); }

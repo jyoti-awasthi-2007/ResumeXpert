@@ -10,6 +10,7 @@ import {
     Shield,
     BarChart3,
     User,
+    Bot,
     ChevronLeft,
     ChevronRight,
     LogOut,
@@ -19,6 +20,7 @@ import BrandLockup from './BrandLockup'
 
 const navItems = [
     { name: 'Dashboard', icon: LayoutDashboard, path: '/dashboard' },
+    { name: 'AI Assistant', icon: Bot, path: '/ai-assistant' },
     { name: 'Resume Analysis', icon: FileText, path: '/resume-analysis' },
     { name: 'Skills', icon: Database, path: '/skills' },
     { name: 'Career Suggestions', icon: Compass, path: '/career-suggestions' },

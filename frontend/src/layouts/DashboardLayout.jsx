@@ -24,6 +24,7 @@ export default function DashboardLayout({ children, title }) {
 
     const pageTitle = title || ({
         '/dashboard': 'Dashboard',
+        '/ai-assistant': 'AI Career Assistant',
         '/resume-analysis': 'Resume Analysis',
         '/skills': 'Your Skills',
         '/career-suggestions': 'Career Suggestions',
