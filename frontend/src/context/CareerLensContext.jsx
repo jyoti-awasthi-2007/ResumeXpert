@@ -375,6 +375,7 @@ export function CareerLensProvider({ children }) {
 
   const submitAssessment = async (answers) => {
     const assessmentId = window.sessionStorage.getItem('careerlens_assessment_id')
+    if (!assessmentId) throw new Error('Assessment session not found. Please start the assessment again.')
     const result = await submitAssessmentRequest(assessmentId, answers)
     const updatedResult = normalizeAssessmentResult(result)
     setAssessmentResult(updatedResult)
@@ -385,6 +386,8 @@ export function CareerLensProvider({ children }) {
   }
 
   const generateAssessmentQuestions = useCallback(async (level) => {
+    if (!resumeState.id) throw new Error('No resume found. Please upload your resume first.')
+    if (!selectedCareerId) throw new Error('No career selected. Please select a career from Career Suggestions.')
     const result = await generateAssessment(resumeState.id, selectedCareerId, level, authUser?.id)
     window.sessionStorage.setItem('careerlens_assessment_id', result.assessment_id)
     return result

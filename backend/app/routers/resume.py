@@ -51,13 +51,14 @@ async def analyze_resume(resume_id: str) -> dict[str, Any]:
         result = resume_service.analyze_resume(resume_id)
         return result
     except HTTPException as error:
-        return {
-            "code": error.detail.get("code", "ANALYSIS_ERROR"),
-            "message": error.detail.get("message", "Analysis failed")
-        }
+        detail = error.detail if isinstance(error.detail, dict) else {"code": "ANALYSIS_ERROR", "message": str(error.detail)}
+        raise HTTPException(
+            status_code=error.status_code,
+            detail=detail,
+        ) from error
     except Exception as error:
         logger.error(f"Resume analysis error: {error}")
-        return {"code": "ANALYSIS_ERROR", "message": str(error)}
+        raise HTTPException(status_code=500, detail={"code": "ANALYSIS_ERROR", "message": str(error)}) from error
 
 
 @router.get("/{resume_id}")
@@ -67,13 +68,14 @@ async def get_resume(resume_id: str) -> dict[str, Any]:
         result = resume_service.get_resume(resume_id)
         return result
     except HTTPException as error:
-        return {
-            "code": error.detail.get("code", "NOT_FOUND"),
-            "message": error.detail.get("message", "Resume not found")
-        }
+        detail = error.detail if isinstance(error.detail, dict) else {"code": "NOT_FOUND", "message": str(error.detail)}
+        raise HTTPException(
+            status_code=error.status_code,
+            detail=detail,
+        ) from error
     except Exception as error:
         logger.error(f"Get resume error: {error}")
-        return {"code": "ERROR", "message": str(error)}
+        raise HTTPException(status_code=500, detail={"code": "ERROR", "message": str(error)}) from error
 
 
 @router.get("/{resume_id}/file")
@@ -83,7 +85,7 @@ async def download_resume(resume_id: str) -> FileResponse:
         file_path = resume_service.get_resume_file(resume_id)
         return FileResponse(
             file_path,
-            filename=f"resume.{Path(file_path).suffix}"
+            filename=f"resume.{Path(file_path).suffix.lstrip('.')}"
         )
     except HTTPException as error:
         raise error

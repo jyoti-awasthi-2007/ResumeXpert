@@ -59,7 +59,7 @@ export default function AssessmentResults() {
           </div>
 
           <div className="grid gap-6 lg:grid-cols-3">
-            {assessmentResult.skills.map((skill) => (
+            {(assessmentResult.skills || []).map((skill) => (
               <div key={skill.name} className="glass-card p-6 rounded-3xl border border-white/10">
                 <div className="flex items-center justify-between mb-4">
                   <div>

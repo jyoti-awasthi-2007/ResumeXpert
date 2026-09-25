@@ -1,5 +1,4 @@
 """Application configuration."""
-import os
 from pathlib import Path
 
 from pydantic_settings import BaseSettings
@@ -11,39 +10,28 @@ class Settings(BaseSettings):
     # Application
     APP_NAME: str = "CareerLens AI API"
     APP_VERSION: str = "1.0.0"
-    DEBUG: bool = os.getenv("DEBUG", "false").lower() == "true"
-    APP_ENV: str = os.getenv("APP_ENV", "development")
+    DEBUG: bool = False
+    APP_ENV: str = "development"
 
     # Database
-    DATABASE_URL: str | None = os.getenv("DATABASE_URL")
+    DATABASE_URL: str | None = None
 
     # File uploads
     # On Render/production, UPLOAD_DIR env var is an absolute path like /tmp/resumexpert-uploads.
     # On local dev, it is relative (./uploads or uploads) and resolves to backend/uploads.
-    UPLOAD_DIR: str = os.getenv("UPLOAD_DIR", "uploads")
-    MAX_UPLOAD_SIZE_MB: int = int(os.getenv("MAX_UPLOAD_SIZE_MB", "10"))
-    MAX_UPLOAD_BYTES: int = MAX_UPLOAD_SIZE_MB * 1024 * 1024
-
-    def get_upload_dir(self) -> Path:
-        """Return the resolved upload directory as a Path object."""
-        raw = self.UPLOAD_DIR.replace("./", "")
-        path = Path(raw)
-        if path.is_absolute():
-            return path.resolve()
-        return (Path(__file__).resolve().parents[1] / raw).resolve()
-
-
+    UPLOAD_DIR: str = "uploads"
+    MAX_UPLOAD_SIZE_MB: int = 10
 
     # Frontend
-    FRONTEND_URL: str = os.getenv("FRONTEND_URL", "http://localhost:5173")
+    FRONTEND_URL: str = "http://localhost:5173"
 
     # AI Configuration
-    AI_PROVIDER: str = os.getenv("AI_PROVIDER", "openai")
-    AI_API_KEY: str = os.getenv("AI_API_KEY", "")
-    AI_MODEL: str = os.getenv("AI_MODEL", "openai/gpt-oss-20b")
-    AI_BASE_URL: str = os.getenv("AI_BASE_URL", "")
-    AI_TIMEOUT: int = int(os.getenv("AI_TIMEOUT", "30"))
-    AI_MAX_RETRIES: int = int(os.getenv("AI_MAX_RETRIES", "3"))
+    AI_PROVIDER: str = "openai"
+    AI_API_KEY: str = ""
+    AI_MODEL: str = "openai/gpt-oss-20b"
+    AI_BASE_URL: str = ""
+    AI_TIMEOUT: int = 30
+    AI_MAX_RETRIES: int = 3
 
     # Allowed file types
     ALLOWED_RESUME_EXTENSIONS: tuple = (".pdf", ".docx", ".doc")
@@ -52,6 +40,18 @@ class Settings(BaseSettings):
         "application/vnd.openxmlformats-officedocument.wordprocessingml.document",
         "application/msword",
     )
+
+    @property
+    def MAX_UPLOAD_BYTES(self) -> int:
+        return self.MAX_UPLOAD_SIZE_MB * 1024 * 1024
+
+    def get_upload_dir(self) -> Path:
+        """Return the resolved upload directory as a Path object."""
+        raw = self.UPLOAD_DIR.replace("./", "")
+        path = Path(raw)
+        if path.is_absolute():
+            return path.resolve()
+        return (Path(__file__).resolve().parents[1] / raw).resolve()
 
     class Config:
         env_file = str(Path(__file__).resolve().parents[1] / ".env")

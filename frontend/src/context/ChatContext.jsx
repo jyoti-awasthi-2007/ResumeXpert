@@ -77,14 +77,15 @@ export function ChatProvider({ children }) {
 
     try {
       const contextPayload = customContext || activeContext || ''
+      const contextString = typeof contextPayload === 'string' ? contextPayload : (contextPayload ? JSON.stringify(contextPayload) : '')
       const response = await api.post('/chat', {
         message: text,
-        context: contextPayload ? JSON.stringify(contextPayload).slice(0, 1000) : '',
+        context: contextString ? contextString.slice(0, 1000) : '',
       })
 
       const assistantMessage = {
         role: 'assistant',
-        text: response.data?.message || 'I have analyzed your request.',
+        text: response.data?.message || 'I am ready to help you with your resume, career matches, and interview questions. Please feel free to ask!',
         timestamp: new Date().toISOString(),
       }
 

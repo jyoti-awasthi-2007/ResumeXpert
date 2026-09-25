@@ -2,6 +2,7 @@ import { useState, useRef, useEffect } from 'react'
 import { useNavigate, useLocation } from 'react-router-dom'
 import { Send, X, Maximize2, Minimize2, ExternalLink, Sparkles, RefreshCw } from 'lucide-react'
 import { useChat } from '../context/ChatContext'
+import { useCareerLens } from '../context/CareerLensContext'
 import ChatMessageContent from './ChatMessageContent'
 import avatar from '../assets/image.png'
 
@@ -10,9 +11,18 @@ export default function HelpChatbot() {
   const [isExpanded, setIsExpanded] = useState(false)
   const [inputMessage, setInputMessage] = useState('')
   const { messages, sending, sendMessage, quickPrompts } = useChat()
+  const { selectedCareer, resumeState, skillGap } = useCareerLens()
   const messagesEndRef = useRef(null)
   const navigate = useNavigate()
   const location = useLocation()
+
+  const buildCurrentContext = () => {
+    const parts = []
+    if (selectedCareer?.title) parts.push(`Target Career: ${selectedCareer.title}`)
+    if (resumeState?.analysis?.skills?.length) parts.push(`User Skills: ${resumeState.analysis.skills.slice(0, 8).join(', ')}`)
+    if (skillGap?.missingSkills?.length) parts.push(`Missing Skills: ${skillGap.missingSkills.slice(0, 5).map(s => s.name || s).join(', ')}`)
+    return parts.join(' | ')
+  }
 
   // Auto-scroll to bottom
   useEffect(() => {
@@ -21,9 +31,10 @@ export default function HelpChatbot() {
     }
   }, [messages, sending, open, isExpanded])
 
-  // If user is already on /ai-assistant full page, we can hide the floating widget to avoid redundancy
+  // Hide on /ai-assistant (redundant) and during MCQ assessment to avoid distractions
   const isFullChatPage = location.pathname === '/ai-assistant'
-  if (isFullChatPage) {
+  const isAssessmentInProgress = /^\/assessment\/(?!results($|\/))[^/]+/.test(location.pathname)
+  if (isFullChatPage || isAssessmentInProgress) {
     return null
   }
 
@@ -33,7 +44,7 @@ export default function HelpChatbot() {
     if (!text || sending) return
 
     setInputMessage('')
-    await sendMessage(text)
+    await sendMessage(text, buildCurrentContext())
   }
 
   const handleOpenFullPage = () => {
@@ -43,7 +54,7 @@ export default function HelpChatbot() {
   }
 
   const handleQuickClick = (promptText) => {
-    sendMessage(promptText)
+    sendMessage(promptText, buildCurrentContext())
   }
 
   return (

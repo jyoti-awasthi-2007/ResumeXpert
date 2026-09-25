@@ -13,8 +13,18 @@ logger = logging.getLogger(__name__)
 class AssessmentService:
     """Service for assessment operations."""
 
+    _instance: "AssessmentService | None" = None
+
+    def __new__(cls, *args, **kwargs):
+        if cls._instance is None:
+            cls._instance = super().__new__(cls)
+        return cls._instance
+
     def __init__(self):
         """Initialize assessment service."""
+        if hasattr(self, "_initialized") and self._initialized:
+            return
+
         self.engine = AssessmentEngine()
         self.store_path = settings.get_upload_dir() / "assessments.json"
         self.store_path.parent.mkdir(parents=True, exist_ok=True)
@@ -23,6 +33,7 @@ class AssessmentService:
         except (OSError, json.JSONDecodeError):
             logger.warning("Assessment store could not be loaded; starting with an empty store.")
             self.assessments = {}
+        self._initialized = True
 
     def _save(self) -> None:
         """Persist assessment sessions and results without exposing answers to clients."""

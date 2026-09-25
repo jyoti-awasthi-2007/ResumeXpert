@@ -9,6 +9,32 @@ function sentencePoints(text) {
   return sentences.length > 2 ? sentences : [text]
 }
 
+export function renderInlineText(rawText) {
+  if (!rawText) return null
+  const cleaned = String(rawText)
+    .replace(/<br\s*\/?>/gi, '\n')
+    .replace(/\uFFFD/g, "'")
+    .replace(/[\u2018\u2019]/g, "'")
+    .replace(/[\u201C\u201D]/g, '"')
+    .replace(/\u2011/g, '-')
+
+  const regex = /(\*\*[^*]+\*\*|\*[^*]+\*|`[^`]+`)/g
+  const parts = cleaned.split(regex)
+
+  return parts.map((part, i) => {
+    if (part.startsWith('**') && part.endsWith('**')) {
+      return <strong key={i} className="font-bold text-primary">{part.slice(2, -2)}</strong>
+    }
+    if ((part.startsWith('*') && part.endsWith('*')) || (part.startsWith('_') && part.endsWith('_'))) {
+      return <em key={i} className="italic">{part.slice(1, -1)}</em>
+    }
+    if (part.startsWith('`') && part.endsWith('`')) {
+      return <code key={i} className="px-1.5 py-0.5 rounded bg-surface-secondary text-accent font-mono text-[0.875em]">{part.slice(1, -1)}</code>
+    }
+    return part
+  })
+}
+
 export function parseMessageBlocks(text) {
   const rawLines = String(text || '').split('\n')
   const blocks = []
@@ -140,7 +166,7 @@ export default function ChatMessageContent({ text, isExpanded = false }) {
                   <tr className="bg-surface-secondary">
                     {block.headers.map((header) => (
                       <th key={header} className="px-3 py-2 text-xs font-semibold text-primary">
-                        {header}
+                        {renderInlineText(header)}
                       </th>
                     ))}
                   </tr>
@@ -150,7 +176,7 @@ export default function ChatMessageContent({ text, isExpanded = false }) {
                     <tr key={`row-${rowIndex}`} className="hover:bg-surface-secondary/40 transition-colors">
                       {row.map((cell, cellIndex) => (
                         <td key={`${rowIndex}-${cellIndex}`} className="px-3 py-2 text-xs text-secondary">
-                          {cell}
+                          {renderInlineText(cell)}
                         </td>
                       ))}
                     </tr>
@@ -167,7 +193,7 @@ export default function ChatMessageContent({ text, isExpanded = false }) {
               className={`chatbot-message-heading font-semibold text-primary ${isExpanded ? 'text-base mt-3 mb-1' : 'text-xs mt-2 mb-1'}`}
               key={`heading-${blockIndex}`}
             >
-              {block.text}
+              {renderInlineText(block.text)}
             </h4>
           )
         }
@@ -184,7 +210,9 @@ export default function ChatMessageContent({ text, isExpanded = false }) {
                   <span className="chatbot-list-marker mt-0.5 flex h-4 w-4 shrink-0 items-center justify-center rounded bg-emerald-50 text-[10px] font-bold text-emerald-600">
                     {block.type === 'numbered' ? itemIndex + 1 : <Check size={11} />}
                   </span>
-                  <span className={isExpanded ? 'text-sm text-slate-700' : 'text-xs text-slate-700'}>{item}</span>
+                  <span className={isExpanded ? 'text-sm text-slate-700' : 'text-xs text-slate-700'}>
+                    {renderInlineText(item)}
+                  </span>
                 </li>
               ))}
             </List>
@@ -200,7 +228,7 @@ export default function ChatMessageContent({ text, isExpanded = false }) {
                   <span className="chatbot-list-marker mt-0.5 flex h-4 w-4 shrink-0 items-center justify-center rounded bg-emerald-50 text-[10px] font-bold text-emerald-600">
                     <Check size={11} />
                   </span>
-                  <span className="text-xs text-slate-700">{point}</span>
+                  <span className="text-xs text-slate-700">{renderInlineText(point)}</span>
                 </li>
               ))}
             </ul>
@@ -212,7 +240,7 @@ export default function ChatMessageContent({ text, isExpanded = false }) {
             className={`chatbot-message-paragraph leading-relaxed ${isExpanded ? 'text-sm text-slate-700' : 'text-xs text-slate-700'}`}
             key={`paragraph-${blockIndex}`}
           >
-            {block.text}
+            {renderInlineText(block.text)}
           </p>
         )
       })}

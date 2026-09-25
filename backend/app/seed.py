@@ -1,15 +1,16 @@
-from .main import CAREERS, QUESTIONS, init_db, db
+"""Seed script for populating initial data.
+
+This script creates database tables and populates the career and skill data
+used by the application. Run with: python -m app.seed
+"""
+from app.database import create_tables
+from app.engines.career_matching import CAREERS_DB
 
 
 def seed() -> None:
-    init_db()
-    with db() as connection:
-        connection.execute("CREATE TABLE IF NOT EXISTS career_seed (id TEXT PRIMARY KEY, data TEXT NOT NULL)")
-        for career in CAREERS:
-            connection.execute("INSERT OR REPLACE INTO career_seed(id, data) VALUES (?, ?)", (career["id"], str(career)))
-        connection.execute("CREATE TABLE IF NOT EXISTS question_seed (id TEXT PRIMARY KEY, data TEXT NOT NULL)")
-        for question in QUESTIONS:
-            connection.execute("INSERT OR REPLACE INTO question_seed(id, data) VALUES (?, ?)", (question["id"], str(question)))
+    """Create database tables and log seed status."""
+    create_tables()
+    print(f"Database tables created. {len(CAREERS_DB)} careers available in-memory.")
 
 
 if __name__ == "__main__":

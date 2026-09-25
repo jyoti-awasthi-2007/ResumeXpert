@@ -267,6 +267,12 @@ class AssessmentEngine:
                 ("What is the best way to build a foundation in {skill}?", ["Combine documentation with small practical exercises", "Memorize unrelated syntax", "Avoid feedback", "Start with production-scale optimization"], 0),
                 ("A beginner using {skill} should primarily focus on:", ["Correct concepts and readable solutions", "Premature micro-optimization", "Ignoring errors", "Removing tests"], 0),
             ],
+            "INTERMEDIATE": [
+                ("Which practice is most effective when improving your {skill} skills beyond the basics?", ["Apply it in real projects and review code with others", "Only read tutorials without practice", "Avoid testing edge cases", "Focus only on theory"], 0),
+                ("When working with {skill} in a team project, what should you prioritize?", ["Clear code, consistent style, and good documentation", "Writing the fastest code possible", "Avoiding any refactoring", "Keeping all logic in one file"], 0),
+                ("What is the most reliable way to validate your understanding of {skill}?", ["Build a project and test it with real scenarios", "Memorize the API without using it", "Only read others' solutions", "Skip error handling"], 0),
+                ("An intermediate {skill} practitioner should be able to:", ["Debug common errors and write tested, maintainable code", "Only copy-paste examples", "Ignore version compatibility", "Avoid reading documentation"], 0),
+            ],
             "ADVANCED": [
                 ("Which approach is most appropriate when applying {skill} in a real project?", ["Choose the technique that fits the constraints and test it", "Use the most complex option by default", "Ignore failure cases", "Avoid measuring the result"], 0),
                 ("When debugging a {skill} implementation, what should you do first?", ["Reproduce and isolate the failing case", "Rewrite everything immediately", "Remove all validation", "Assume the input is always valid"], 0),

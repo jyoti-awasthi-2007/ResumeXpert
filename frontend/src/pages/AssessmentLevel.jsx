@@ -19,13 +19,32 @@ export default function AssessmentLevel() {
   const [error, setError] = useState('')
   const [timeLeft, setTimeLeft] = useState(15 * 60)
   const generationKey = useRef('')
+  const readyTimerRef = useRef(null)
   const navigate = useNavigate()
 
   const currentQuestion = questions[current]
   const levelMeta = useMemo(() => assessmentLevels.find((item) => item.id === level), [assessmentLevels, level])
 
   useEffect(() => {
-    if (!resumeState.id || !selectedCareer?.id) return
+    // If prerequisites are not yet available, wait up to 8 s before showing an error
+    if (!resumeState.id || !selectedCareer?.id) {
+      if (!readyTimerRef.current) {
+        readyTimerRef.current = window.setTimeout(() => {
+          if (!resumeState.id) {
+            setError('No resume found. Please upload your resume first.')
+          } else {
+            setError('No career selected. Please select a career from Career Suggestions first.')
+          }
+          setLoading(false)
+        }, 8000)
+      }
+      return
+    }
+    // Clear the safety timer – prerequisites arrived in time
+    if (readyTimerRef.current) {
+      window.clearTimeout(readyTimerRef.current)
+      readyTimerRef.current = null
+    }
     const requestKey = `${resumeState.id}:${selectedCareer.id}:${level}`
     if (generationKey.current === requestKey) return
     generationKey.current = requestKey
@@ -33,15 +52,23 @@ export default function AssessmentLevel() {
     setError('')
     generateAssessmentQuestions(level).then((data) => {
       const nextQuestions = Array.isArray(data?.questions) ? data.questions : []
+      if (nextQuestions.length === 0) {
+        setError('No questions were generated. Please try again.')
+      }
       setQuestions(nextQuestions)
       setCurrent(0)
       setSelectedAnswers([])
       setLoading(false)
     }).catch((requestError) => {
-      setError(requestError?.response?.data?.message || requestError?.message || 'Unable to prepare the assessment.')
+      setError(requestError?.response?.data?.message || requestError?.message || 'Unable to prepare the assessment. Please try again.')
       setLoading(false)
     })
-    return undefined
+    return () => {
+      if (readyTimerRef.current) {
+        window.clearTimeout(readyTimerRef.current)
+        readyTimerRef.current = null
+      }
+    }
   }, [generateAssessmentQuestions, level, resumeState.id, selectedCareer?.id])
 
   useEffect(() => {

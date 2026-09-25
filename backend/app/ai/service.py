@@ -347,36 +347,126 @@ Generate 3-5 recommendations with highest priority skills first."""
             return self._get_fallback_recommendations(missing_skills, career_path)
 
     def chat(self, message: str, context: Optional[str] = None) -> str:
-        """Answer a user help question with the configured Groq-compatible model."""
-        prompt = f"""You are CareerLens AI support. Help the user use this resume and career analysis application.
-Give a clear, concise, practical answer. If the issue is a technical error, suggest checks without exposing secrets.
-Application context: {context or 'No additional context provided'}
-User question: {message}"""
+        """Answer a user help question with the configured AI model."""
+        system_prompt = (
+            "You are ResumeXpert AI Career Assistant, the built-in intelligent guide for the ResumeXpert platform. "
+            "Your mission is to help users excel with their resumes, career roadmaps, skill gaps, technical interview preparation, and skill assessments.\n"
+            "Key Instructions:\n"
+            "1. When the user asks about 'this system', 'the app', or 'how to use this', explain how to use the ResumeXpert platform itself (Dashboard, Resume Analysis, Career Suggestions, Skill Gap, Assessments, Career Readiness).\n"
+            "2. When the user asks what skills are important or in-demand, provide a clear, prioritized breakdown of core technical and domain skills.\n"
+            "3. Structure your response with clear headings, bullet points, and bold text. Keep answers focused, rich, and well-structured (around 400 to 650 words).\n"
+            "4. Always deliver a complete, fully finished answer. Finish every section, list, table, and conclusion completely. Never cut off."
+        )
+
+        user_content_parts = []
+        if context and context.strip():
+            user_content_parts.append(f"User Profile / Context: {context.strip()}")
+        user_content_parts.append(f"User Question: {message.strip()}")
+        user_content_parts.append("Please provide a thorough, complete, and fully finished actionable response.")
+        prompt = "\n\n".join(user_content_parts)
+
         try:
             response = self.client.chat.completions.create(
                 model=self.model,
                 messages=[
-                    {"role": "system", "content": "You are a helpful support assistant for CareerLens AI."},
+                    {"role": "system", "content": system_prompt},
                     {"role": "user", "content": prompt},
                 ],
                 temperature=0.4,
-                max_tokens=250,
-                timeout=min(self.timeout, 6),
+                max_tokens=3072,
+                timeout=min(self.timeout, 55),
             )
-            return response.choices[0].message.content.strip()
+            content = (response.choices[0].message.content or "").strip()
+            if not content:
+                return self._fallback_chat(message)
+            return content
         except Exception as error:
             logger.error(f"Error generating chat response: {error}")
             return self._fallback_chat(message)
 
     @staticmethod
     def _fallback_chat(message: str) -> str:
-        """Provide useful support when the AI service is temporarily unavailable."""
-        question = message.lower()
-        if "upload" in question or "pdf" in question:
-            return "Make sure the backend is running on port 8000, then try a PDF or DOCX under 10 MB."
-        if "skill" in question:
-            return "Upload your resume first. CareerLens extracts recognized skills and uses them for career matches and skill-gap analysis."
-        return "I can help with resume uploads, skill extraction, career matches, assessments, and navigation. Please describe the issue you are seeing."
+        """Provide rich, structured support when the external AI service is temporarily unavailable."""
+        q = message.lower()
+
+        if "how" in q and ("use" in q or "system" in q or "work" in q or "start" in q):
+            return (
+                "### How to Use the ResumeXpert System\n\n"
+                "ResumeXpert is designed to guide you step-by-step from resume upload to career readiness:\n\n"
+                "1. **Upload Resume (`Resume Analysis`)**: Upload your resume in PDF or DOCX format. The system automatically parses your profile, scores ATS compliance, and extracts your key skills.\n"
+                "2. **Explore In-Demand Roles (`Career Suggestions`)**: Discover matched careers ranked by compatibility with your current technical skill set.\n"
+                "3. **Analyze Missing Skills (`Skill Gap`)**: See exact skills required for your target role that are missing from your resume, along with prioritized recommendations.\n"
+                "4. **Validate Your Knowledge (`Skill Assessment`)**: Take interactive, AI-generated multiple-choice assessments to test your claimed skills.\n"
+                "5. **Track Readiness (`Career Readiness`)**: Monitor your overall match score, verified skills vs. claimed skills, and readiness breakdown for hiring."
+            )
+
+        if "which skill" in q or "what skill" in q or "important skill" in q or "skills are important" in q:
+            return (
+                "### Top In-Demand Skills for Modern Roles\n\n"
+                "Depending on your career trajectory, employers prioritize these critical skill pillars:\n\n"
+                "• **Backend & Core Programming**: Python, Java, JavaScript/TypeScript, Go, or C# with solid understanding of OOP, data structures, and algorithms.\n"
+                "• **Web & API Frameworks**: FastAPI, Django, Node.js/Express, Spring Boot, or React for full-stack integration.\n"
+                "• **Database Management**: Relational databases (PostgreSQL, MySQL) and NoSQL (MongoDB, Redis), including query optimization and indexing.\n"
+                "• **Cloud & DevOps**: Docker containerization, Kubernetes orchestration, CI/CD pipelines, and cloud services (AWS, Azure, GCP).\n"
+                "• **System Design & Security**: RESTful APIs, microservices, authentication (OAuth/JWT), caching, and scalability.\n"
+                "• **Essential Soft Skills**: Structured problem-solving, clean code documentation, and clear technical communication."
+            )
+
+        if "score" in q or "improve" in q or "impact" in q:
+            return (
+                "### How to Improve Your Resume Score & Impact\n\n"
+                "1. **Quantify Achievements**: Use concrete metrics (e.g., 'Increased pipeline efficiency by 35%').\n"
+                "2. **Keyword Optimization**: Include core skills matching target job titles (e.g., React, Python, AWS, Docker).\n"
+                "3. **Action Verbs**: Start bullets with strong impact verbs like *Architected*, *Spearheaded*, *Optimized*, or *Deployed*.\n"
+                "4. **Tailored Summary**: Keep a 3-4 line professional summary highlighting your top stack and total experience.\n"
+                "5. **Clean Formatting**: Use standard section headers (Experience, Skills, Projects, Education) for maximum ATS readability."
+            )
+
+        if "skill" in q or "gap" in q or "missing" in q:
+            return (
+                "### Skill Gap Analysis & Strategy\n\n"
+                "• **Identify Target Role Requirements**: Review top skill matches on the Career Paths page.\n"
+                "• **Prioritize Core Gaps**: Focus first on high-frequency required skills (e.g., Cloud Platforms, System Design).\n"
+                "• **Take Assessments**: Use the Skill Assessments tab to validate your knowledge level.\n"
+                "• **Project-Based Learning**: Build 1-2 open-source or portfolio projects featuring missing technologies."
+            )
+
+        if "interview" in q or "prep" in q or "question" in q:
+            return (
+                "### Technical Interview Preparation Strategy\n\n"
+                "1. **Core Fundamentals**: Be ready to explain data structures, system design, and API design for your primary stack.\n"
+                "2. **STAR Method**: Frame behavioral questions using **S**ituation, **T**ask, **A**ction, **R**esult.\n"
+                "3. **Code Quality**: Practice writing clean, modular code with proper error handling and complexity analysis.\n"
+                "4. **System Architecture**: Explain trade-offs in database selection, caching strategies, and scalability.\n"
+                "5. **Mock Practice**: Take targeted skill quizzes in ResumeXpert to test your readiness."
+            )
+
+        if "plan" in q or "roadmap" in q or "90" in q or "30" in q:
+            return (
+                "### 30-60-90 Day Career Acceleration Plan\n\n"
+                "• **Days 1–30 (Foundation)**: Master critical missing technical skills and complete beginner/intermediate assessments.\n"
+                "• **Days 31–60 (Application)**: Build an end-to-end portfolio project incorporating modern tools and cloud deployment.\n"
+                "• **Days 61–90 (Optimization & Outreach)**: Polish your resume score to 85%+, practice technical mock interviews, and apply to target roles."
+            )
+
+        if "upload" in q or "pdf" in q or "docx" in q or "file" in q:
+            return (
+                "### Resume Upload Assistance\n\n"
+                "• **Supported Formats**: PDF, DOCX, or Plain Text (.txt).\n"
+                "• **File Size Limit**: Up to 10 MB.\n"
+                "• **Best Results**: Ensure text is selectable (avoid scanned image PDFs)."
+            )
+
+        return (
+            "### ResumeXpert Career Assistant\n\n"
+            "I can assist you with:\n"
+            "• **Resume Score Optimization** – Action verbs, ATS keywords & formatting\n"
+            "• **Skill Gap Analysis** – Identifying missing skills for target roles\n"
+            "• **Interview Preparation** – Technical questions & STAR framework tips\n"
+            "• **Career Roadmaps** – 30-60-90 day structured action plans\n"
+            "• **System Navigation** – Guide on using ResumeXpert features\n\n"
+            "Feel free to ask any question about your resume, careers, or the system!"
+        )
 
     @staticmethod
     def _get_fallback_mcq(skill: str, difficulty: str) -> dict[str, Any]:

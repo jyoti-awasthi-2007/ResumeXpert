@@ -20,6 +20,16 @@ if DATABASE_URL.startswith("postgres://"):
 elif DATABASE_URL.startswith("postgresql://"):
     DATABASE_URL = "postgresql+psycopg://" + DATABASE_URL.removeprefix("postgresql://")
 
+# Resolve relative sqlite paths against the backend directory so the DB
+# is always found regardless of the working directory used to start the server.
+if DATABASE_URL.startswith("sqlite"):
+    import re
+    match = re.match(r"sqlite:///(.+)", DATABASE_URL)
+    if match:
+        db_path = Path(match.group(1))
+        if not db_path.is_absolute():
+            DATABASE_URL = f"sqlite:///{BASE_DIR / db_path}"
+
 connect_args = {"check_same_thread": False} if DATABASE_URL.startswith("sqlite") else {}
 engine = create_engine(DATABASE_URL, connect_args=connect_args, pool_pre_ping=True)
 SessionLocal = sessionmaker(bind=engine, autoflush=False, autocommit=False)
