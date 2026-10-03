@@ -1,0 +1,111 @@
+career_title,skill_name,skill_type,priority,relevance_weight
+Data Scientist,Python,Core,High,1.0
+Data Scientist,Pandas,Core,High,0.95
+Data Scientist,NumPy,Core,High,0.9
+Data Scientist,Scikit-learn,Core,High,0.95
+Data Scientist,Statistics,Core,High,0.95
+Data Scientist,Machine Learning,Core,High,1.0
+Data Scientist,SQL,Core,High,0.9
+Data Scientist,Matplotlib,Supporting,Medium,0.75
+Data Scientist,Seaborn,Supporting,Medium,0.75
+Data Scientist,Jupyter,Supporting,Medium,0.7
+Data Scientist,Feature Engineering,Supporting,High,0.85
+Data Scientist,Data Visualization,Supporting,Medium,0.8
+Data Scientist,TensorFlow,Supporting,Medium,0.7
+Machine Learning Engineer,Python,Core,High,1.0
+Machine Learning Engineer,PyTorch,Core,High,0.95
+Machine Learning Engineer,TensorFlow,Core,High,0.95
+Machine Learning Engineer,Scikit-learn,Core,High,0.9
+Machine Learning Engineer,Machine Learning,Core,High,1.0
+Machine Learning Engineer,Deep Learning,Core,High,1.0
+Machine Learning Engineer,Docker,Core,High,0.85
+Machine Learning Engineer,MLflow,Supporting,Medium,0.8
+Machine Learning Engineer,FastAPI,Supporting,Medium,0.75
+Machine Learning Engineer,NumPy,Supporting,Medium,0.8
+Machine Learning Engineer,Pandas,Supporting,Medium,0.8
+Machine Learning Engineer,Kubernetes,Supporting,Medium,0.75
+Machine Learning Engineer,AWS,Supporting,Medium,0.75
+Machine Learning Engineer,Model Deployment,Supporting,High,0.9
+Data Analyst,SQL,Core,High,1.0
+Data Analyst,Excel,Core,High,0.95
+Data Analyst,Power BI,Core,High,0.95
+Data Analyst,Tableau,Core,High,0.95
+Data Analyst,Python,Core,High,0.85
+Data Analyst,Pandas,Core,High,0.85
+Data Analyst,Data Visualization,Core,High,0.95
+Data Analyst,Statistics,Supporting,High,0.8
+Data Analyst,Dashboarding,Supporting,High,0.9
+Data Analyst,Reporting,Supporting,High,0.85
+Data Analyst,Business Intelligence,Supporting,High,0.9
+Data Analyst,Google Sheets,Supporting,Low,0.65
+Data Analyst,Matplotlib,Supporting,Medium,0.7
+Full Stack Developer,JavaScript,Core,High,1.0
+Full Stack Developer,TypeScript,Core,High,0.9
+Full Stack Developer,React,Core,High,0.95
+Full Stack Developer,Node.js,Core,High,0.95
+Full Stack Developer,Express,Core,High,0.9
+Full Stack Developer,HTML,Core,High,0.85
+Full Stack Developer,CSS,Core,High,0.85
+Full Stack Developer,MongoDB,Core,High,0.85
+Full Stack Developer,Next.js,Supporting,Medium,0.8
+Full Stack Developer,Git,Supporting,High,0.85
+Full Stack Developer,REST API,Supporting,High,0.9
+Full Stack Developer,Tailwind CSS,Supporting,Medium,0.75
+Full Stack Developer,SQL,Supporting,Medium,0.8
+Full Stack Developer,Docker,Supporting,Medium,0.7
+Frontend Developer,JavaScript,Core,High,1.0
+Frontend Developer,TypeScript,Core,High,0.95
+Frontend Developer,React,Core,High,1.0
+Frontend Developer,HTML,Core,High,0.9
+Frontend Developer,CSS,Core,High,0.9
+Frontend Developer,Tailwind CSS,Core,High,0.85
+Frontend Developer,Vite,Core,Medium,0.8
+Frontend Developer,Next.js,Supporting,High,0.85
+Frontend Developer,Redux,Supporting,Medium,0.8
+Frontend Developer,Figma,Supporting,Medium,0.75
+Frontend Developer,Responsive Design,Supporting,High,0.95
+Frontend Developer,Framer Motion,Supporting,Medium,0.7
+Frontend Developer,Git,Supporting,High,0.8
+Frontend Developer,REST API,Supporting,High,0.8
+Backend Developer,Python,Core,High,0.95
+Backend Developer,FastAPI,Core,High,0.9
+Backend Developer,Node.js,Core,High,0.9
+Backend Developer,Express,Core,High,0.85
+Backend Developer,SQL,Core,High,0.95
+Backend Developer,PostgreSQL,Core,High,0.9
+Backend Developer,REST API,Core,High,1.0
+Backend Developer,Redis,Supporting,Medium,0.8
+Backend Developer,Docker,Supporting,High,0.85
+Backend Developer,Authentication,Supporting,High,0.9
+Backend Developer,JWT,Supporting,High,0.85
+Backend Developer,MongoDB,Supporting,Medium,0.75
+Backend Developer,Git,Supporting,High,0.85
+Backend Developer,Microservices,Supporting,High,0.85
+DevOps Engineer,Linux,Core,High,1.0
+DevOps Engineer,Docker,Core,High,1.0
+DevOps Engineer,Kubernetes,Core,High,1.0
+DevOps Engineer,AWS,Core,High,0.95
+DevOps Engineer,CI/CD,Core,High,1.0
+DevOps Engineer,GitHub Actions,Core,High,0.9
+DevOps Engineer,Terraform,Core,High,0.95
+DevOps Engineer,Python,Supporting,Medium,0.8
+DevOps Engineer,Bash,Supporting,High,0.85
+DevOps Engineer,Nginx,Supporting,Medium,0.75
+DevOps Engineer,Prometheus,Supporting,High,0.85
+DevOps Engineer,Grafana,Supporting,High,0.85
+DevOps Engineer,Azure,Supporting,Medium,0.75
+DevOps Engineer,GCP,Supporting,Medium,0.75
+Cybersecurity Analyst,Network Security,Core,High,1.0
+Cybersecurity Analyst,Linux,Core,High,0.9
+Cybersecurity Analyst,Python,Core,Medium,0.8
+Cybersecurity Analyst,SIEM,Core,High,0.95
+Cybersecurity Analyst,Wireshark,Core,High,0.95
+Cybersecurity Analyst,Penetration Testing,Core,High,0.95
+Cybersecurity Analyst,Incident Response,Core,High,1.0
+Cybersecurity Analyst,Splunk,Supporting,High,0.85
+Cybersecurity Analyst,Nmap,Supporting,High,0.85
+Cybersecurity Analyst,Burp Suite,Supporting,High,0.85
+Cybersecurity Analyst,Firewalls,Supporting,High,0.9
+Cybersecurity Analyst,Vulnerability Assessment,Supporting,High,0.95
+Cybersecurity Analyst,Threat Analysis,Supporting,High,0.9
+Cybersecurity Analyst,Bash,Supporting,Medium,0.75

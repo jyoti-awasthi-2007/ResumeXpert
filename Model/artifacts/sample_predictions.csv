@@ -1,0 +1,11 @@
+sample_id,input_summary,actual_class,predicted_class,top_probability,correct
+DEMO-DS-01,"Senior undergraduate specializing in Data Science. Skilled in Python, Pandas, NumPy, Scikit-learn,...",Data Scientist,Data Scientist,0.857,True
+DEMO-MLE-02,"AI and ML enthusiast with hands-on experience in PyTorch, TensorFlow, and Scikit-learn....",Machine Learning Engineer,Machine Learning Engineer,0.896,True
+DEMO-DA-03,"Business analytics professional with expertise in advanced SQL queries, window functions, Excel...",Data Analyst,Data Analyst,0.9391,True
+DEMO-FSD-04,"Full Stack Web Developer proficient in JavaScript, TypeScript, React, Node.js, Express, and...",Full Stack Developer,Full Stack Developer,0.9077,True
+DEMO-FED-05,"Frontend Engineer focused on building responsive, accessible, and high-performance user interfaces. Expert...",Frontend Developer,Frontend Developer,0.8848,True
+DEMO-BED-06,Backend Systems Developer experienced in designing high-throughput REST APIs and microservices using...,Backend Developer,Backend Developer,0.9219,True
+DEMO-DOE-07,"Cloud and DevOps Practitioner with hands-on expertise in Linux administration, Docker containerization,...",DevOps Engineer,DevOps Engineer,0.9544,True
+DEMO-CSA-08,"Information Security Analyst skilled in network security fundamentals, packet inspection using Wireshark,...",Cybersecurity Analyst,Cybersecurity Analyst,0.9185,True
+DEMO-DS-09,"Applied data scientist with strong background in mathematical statistics, linear algebra, Python,...",Data Scientist,Data Scientist,0.6424,True
+DEMO-BED-10,"Server-side engineer with background in building RESTful services, relational database schemas in...",Backend Developer,Backend Developer,0.7181,True

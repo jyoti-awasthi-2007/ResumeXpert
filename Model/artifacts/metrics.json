@@ -1,0 +1,34 @@
+{
+  "task": "resume_text_to_career_classification",
+  "dataset": "synthetic_resume_career_dataset.csv",
+  "dataset_type": "synthetic",
+  "random_seed": 42,
+  "total_samples": 1600,
+  "train_samples": 1280,
+  "test_samples": 320,
+  "test_split_ratio": 0.2,
+  "num_classes": 8,
+  "classes": [
+    "Backend Developer",
+    "Cybersecurity Analyst",
+    "Data Analyst",
+    "Data Scientist",
+    "DevOps Engineer",
+    "Frontend Developer",
+    "Full Stack Developer",
+    "Machine Learning Engineer"
+  ],
+  "model": "TF-IDF + Logistic Regression",
+  "tfidf_ngram_range": [
+    1,
+    2
+  ],
+  "tfidf_vocabulary_size": 1594,
+  "accuracy": 1.0,
+  "macro_precision": 1.0,
+  "macro_recall": 1.0,
+  "macro_f1": 1.0,
+  "weighted_precision": 1.0,
+  "weighted_recall": 1.0,
+  "weighted_f1": 1.0
+}

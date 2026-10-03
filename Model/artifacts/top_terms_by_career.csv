@@ -1,0 +1,121 @@
+career,rank,term,coefficient
+Backend Developer,1,postgresql,1.7557494271566845
+Backend Developer,2,fastapi,1.54148578038324
+Backend Developer,3,api,1.337604087125614
+Backend Developer,4,authentication,1.3363798251036747
+Backend Developer,5,rest,1.2728825142621412
+Backend Developer,6,express,1.1090702644467902
+Backend Developer,7,node js,1.0677104791497976
+Backend Developer,8,node,1.0677104791497976
+Backend Developer,9,services and,1.0486106482009965
+Backend Developer,10,scalable backend,1.0486106482009965
+Backend Developer,11,and rest,1.0486106482009965
+Backend Developer,12,backend,1.0486106482009965
+Backend Developer,13,scalable,1.0486106482009965
+Backend Developer,14,built scalable,1.0486106482009965
+Backend Developer,15,backend services,1.0486106482009965
+Cybersecurity Analyst,1,security,1.5809949670054941
+Cybersecurity Analyst,2,incident,1.5419959104178829
+Cybersecurity Analyst,3,network,1.5029454692074222
+Cybersecurity Analyst,4,analysis,1.473837839133531
+Cybersecurity Analyst,5,penetration,1.4129243745600104
+Cybersecurity Analyst,6,penetration testing,1.4129243745600104
+Cybersecurity Analyst,7,testing,1.4129243745600104
+Cybersecurity Analyst,8,siem,1.2447851871771356
+Cybersecurity Analyst,9,network security,1.2159708858770324
+Cybersecurity Analyst,10,wireshark,1.1776318875596712
+Cybersecurity Analyst,11,incident response,1.1336913341340908
+Cybersecurity Analyst,12,response,1.1336913341340908
+Cybersecurity Analyst,13,vulnerability,1.1176232497026408
+Cybersecurity Analyst,14,vulnerability assessment,1.1176232497026408
+Cybersecurity Analyst,15,assessment,1.1176232497026408
+Data Analyst,1,tableau,1.6330964152332745
+Data Analyst,2,data,1.6132893296646629
+Data Analyst,3,reporting,1.5935966161103055
+Data Analyst,4,excel,1.561931031080452
+Data Analyst,5,bi,1.560370989431094
+Data Analyst,6,power,1.560370989431094
+Data Analyst,7,power bi,1.560370989431094
+Data Analyst,8,business,1.2509947629973335
+Data Analyst,9,visualization,1.2232342968365122
+Data Analyst,10,data visualization,1.2232342968365122
+Data Analyst,11,business intelligence,0.9441047984120027
+Data Analyst,12,created automated,0.9007391659769666
+Data Analyst,13,automated reporting,0.9007391659769666
+Data Analyst,14,reporting workflows,0.9007391659769666
+Data Analyst,15,google,0.8959971294825364
+Data Scientist,1,statistics,1.4603860960068218
+Data Scientist,2,numpy,1.4504158047534226
+Data Scientist,3,seaborn,1.1761501512314994
+Data Scientist,4,feature,1.1349179555103652
+Data Scientist,5,feature engineering,1.1349179555103652
+Data Scientist,6,jupyter,1.1283365200116162
+Data Scientist,7,created customer,1.0188545711058767
+Data Scientist,8,workflow,1.0188545711058767
+Data Scientist,9,prediction,1.0188545711058767
+Data Scientist,10,customer churn,1.0188545711058767
+Data Scientist,11,churn prediction,1.0188545711058767
+Data Scientist,12,churn,1.0188545711058767
+Data Scientist,13,workflow worked,1.0188545711058767
+Data Scientist,14,prediction workflow,1.0188545711058767
+Data Scientist,15,scikit learn,1.015105975185336
+DevOps Engineer,1,terraform,1.5655593239639702
+DevOps Engineer,2,github actions,1.4588123618986881
+DevOps Engineer,3,actions,1.4588123618986881
+DevOps Engineer,4,ci cd,1.438015831760933
+DevOps Engineer,5,ci,1.438015831760933
+DevOps Engineer,6,cd,1.438015831760933
+DevOps Engineer,7,aws,1.3097498288741298
+DevOps Engineer,8,kubernetes,1.3052027793669065
+DevOps Engineer,9,github,1.2263689579209494
+DevOps Engineer,10,gcp,0.9354194001976659
+DevOps Engineer,11,azure,0.9340419742929458
+DevOps Engineer,12,linux,0.8989291806560464
+DevOps Engineer,13,deployment pipelines,0.8359497451027369
+DevOps Engineer,14,cloud infrastructure,0.8359497451027369
+DevOps Engineer,15,automated deployment,0.8359497451027369
+Frontend Developer,1,vite,1.6672167609721948
+Frontend Developer,2,css,1.6593707639312874
+Frontend Developer,3,responsive,1.4585740519772963
+Frontend Developer,4,react,1.3427140592487272
+Frontend Developer,5,tailwind css,1.2649140440450992
+Frontend Developer,6,tailwind,1.2649140440450992
+Frontend Developer,7,design,1.2622929378533794
+Frontend Developer,8,css vite,1.0623114857263665
+Frontend Developer,9,accessible,1.0487645573044866
+Frontend Developer,10,responsive and,1.0487645573044866
+Frontend Developer,11,user,1.0487645573044866
+Frontend Developer,12,user interfaces,1.0487645573044866
+Frontend Developer,13,accessible user,1.0487645573044866
+Frontend Developer,14,built responsive,1.0487645573044866
+Frontend Developer,15,and accessible,1.0487645573044866
+Full Stack Developer,1,web applications,1.6561826792269365
+Full Stack Developer,2,mongodb,1.5194406394262256
+Full Stack Developer,3,js,1.3546736198113152
+Full Stack Developer,4,applications,1.3505748685136076
+Full Stack Developer,5,web,1.3252473670310383
+Full Stack Developer,6,css,1.2439517417304937
+Full Stack Developer,7,express,1.208823699229105
+Full Stack Developer,8,node js,1.1954016944900294
+Full Stack Developer,9,node,1.1954016944900294
+Full Stack Developer,10,javascript,1.1605847976141876
+Full Stack Developer,11,frontend interfaces,1.1175282952686463
+Full Stack Developer,12,frontend,1.1175282952686463
+Full Stack Developer,13,apis and,1.1175282952686463
+Full Stack Developer,14,and responsive,1.1175282952686463
+Full Stack Developer,15,responsive frontend,1.1175282952686463
+Machine Learning Engineer,1,learning,2.241136989312659
+Machine Learning Engineer,2,deep,2.0165363408863737
+Machine Learning Engineer,3,deep learning,2.0165363408863737
+Machine Learning Engineer,4,pytorch,1.5949988803299573
+Machine Learning Engineer,5,inference,1.433860891333375
+Machine Learning Engineer,6,model,1.3352812889600876
+Machine Learning Engineer,7,machine,1.2607941837851664
+Machine Learning Engineer,8,machine learning,1.2607941837851664
+Machine Learning Engineer,9,tensorflow,1.184212067529885
+Machine Learning Engineer,10,learn,0.980326673386589
+Machine Learning Engineer,11,scikit,0.980326673386589
+Machine Learning Engineer,12,scikit learn,0.980326673386589
+Machine Learning Engineer,13,learning inference,0.8828210295634324
+Machine Learning Engineer,14,deployed machine,0.8828210295634324
+Machine Learning Engineer,15,inference services,0.8828210295634324

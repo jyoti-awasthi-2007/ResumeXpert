@@ -1,0 +1,88 @@
+skill_id,skill_name,category,aliases,description
+SKILL-001,Python,Programming Languages,"py, python3","High-level programming language used widely in data science, AI, web backends, and scripting."
+SKILL-002,JavaScript,Programming Languages,"js, es6",Core web language for interactive client-side and full-stack development.
+SKILL-003,TypeScript,Programming Languages,ts,Statically typed superset of JavaScript enhancing code maintainability and tooling.
+SKILL-004,Java,Programming Languages,"java8, java17","Object-oriented, class-based language used for enterprise backend systems."
+SKILL-005,C++,Programming Languages,cpp,Performance-critical systems and application programming language.
+SKILL-006,SQL,Programming Languages,"ansi-sql, structured query language",Declarative database language for querying and managing relational data.
+SKILL-007,Bash,Programming Languages,"shell, sh",Command language interpreter for Unix-like operating systems and automation.
+SKILL-008,R,Programming Languages,r-lang,Statistical computing and graphics programming language.
+SKILL-009,Go,Programming Languages,golang,Statically typed compiled language designed for concurrency and microservices.
+SKILL-010,React,Web & Frontend,"reactjs, react.js",Component-based declarative UI library for building single-page applications.
+SKILL-011,HTML,Web & Frontend,html5,Standard markup language for documents designed to be displayed in a web browser.
+SKILL-012,CSS,Web & Frontend,css3,Style sheet language used for describing the presentation of HTML documents.
+SKILL-013,Tailwind CSS,Web & Frontend,tailwind,Utility-first CSS framework for rapid UI styling.
+SKILL-014,Vite,Web & Frontend,vitejs,Next-generation frontend tooling and fast dev server.
+SKILL-015,Next.js,Web & Frontend,nextjs,React framework for server-side rendering and static site generation.
+SKILL-016,Redux,Web & Frontend,redux-toolkit,Predictable state container for JavaScript applications.
+SKILL-017,Figma,Web & Frontend,"ui-ux, prototyping",Collaborative interface design and wireframing tool.
+SKILL-018,Responsive Design,Web & Frontend,mobile-first,Design approach creating web pages that adapt smoothly to diverse screen sizes.
+SKILL-019,Framer Motion,Web & Frontend,motion-ui,Production-ready motion and animation library for React.
+SKILL-020,Bootstrap,Web & Frontend,bootstrap5,Popular CSS framework with prebuilt responsive components.
+SKILL-021,jQuery,Web & Frontend,jquery-lib,"Fast, small JavaScript library for DOM manipulation."
+SKILL-022,Node.js,Backend & APIs,"nodejs, node",Asynchronous event-driven JavaScript runtime for server-side applications.
+SKILL-023,Express,Backend & APIs,expressjs,"Fast, minimalist web framework for Node.js."
+SKILL-024,FastAPI,Backend & APIs,fastapi-python,"Modern, fast web framework for building APIs with Python based on standard type hints."
+SKILL-025,Django,Backend & APIs,django-python,"High-level Python web framework encouraging clean, pragmatic design."
+SKILL-026,REST API,Backend & APIs,"rest, restful web services",Architectural style for designing networked applications over HTTP.
+SKILL-027,Microservices,Backend & APIs,service-oriented,Architectural pattern structuring applications as collections of decoupled services.
+SKILL-028,Authentication,Backend & APIs,"auth, oauth2",Security process verifying the identity of a user or system.
+SKILL-029,JWT,Backend & APIs,json-web-token,Compact URL-safe means of representing claims to be transferred between parties.
+SKILL-030,PostgreSQL,Databases & Storage,"postgres, pgsql","Powerful, open source object-relational database system."
+SKILL-031,MySQL,Databases & Storage,mysql-db,Widely deployed relational database management system.
+SKILL-032,MongoDB,Databases & Storage,"mongo, nosql",Document-oriented NoSQL database for unstructured and flexible schemas.
+SKILL-033,Redis,Databases & Storage,in-memory-cache,"In-memory data structure store used as a database, cache, and message broker."
+SKILL-034,Database Design,Databases & Storage,"data-modeling, schema-design",Process of producing a detailed data model and schema for database implementation.
+SKILL-035,Machine Learning,AI & Machine Learning,"ml, statistical-learning",Study of computer algorithms that improve automatically through data and experience.
+SKILL-036,Deep Learning,AI & Machine Learning,"dl, neural-networks",Subfield of ML based on multi-layer artificial neural networks.
+SKILL-037,Scikit-learn,AI & Machine Learning,sklearn,Comprehensive Python library for machine learning and predictive data analysis.
+SKILL-038,TensorFlow,AI & Machine Learning,tf,End-to-end open source platform for machine learning by Google.
+SKILL-039,PyTorch,AI & Machine Learning,torch,Open source machine learning framework based on the Torch library.
+SKILL-040,Pandas,AI & Machine Learning,dataframe-lib,"Fast, powerful data manipulation and analysis tool for Python."
+SKILL-041,NumPy,AI & Machine Learning,numerical-python,Fundamental package for scientific computing with multidimensional arrays.
+SKILL-042,Statistics,AI & Machine Learning,"statistical-inference, hypothesis-testing","Mathematical discipline concerning data collection, organization, analysis, and interpretation."
+SKILL-043,Feature Engineering,AI & Machine Learning,feature-extraction,Using domain knowledge to extract features from raw data for ML models.
+SKILL-044,Model Deployment,AI & Machine Learning,"model-serving, inference-api",Process of integrating an ML model into an existing production environment.
+SKILL-045,MLflow,AI & Machine Learning,experiment-tracking,Open source platform for the machine learning lifecycle and experiment tracking.
+SKILL-046,Data Visualization,Data Analysis & BI,"dataviz, charts",Graphical representation of information and data.
+SKILL-047,Power BI,Data Analysis & BI,"powerbi, ms-bi",Interactive data visualization software product developed by Microsoft.
+SKILL-048,Tableau,Data Analysis & BI,tableau-software,Visual analytics platform transforming data for business intelligence.
+SKILL-049,Excel,Data Analysis & BI,"ms-excel, spreadsheets","Spreadsheet application for calculations, pivot tables, and tabular data."
+SKILL-050,Matplotlib,Data Analysis & BI,pyplot,"Comprehensive library for creating static, animated, and interactive visualizations in Python."
+SKILL-051,Seaborn,Data Analysis & BI,sns,Statistical data visualization library based on matplotlib.
+SKILL-052,Jupyter,Data Analysis & BI,"ipynb, notebook",Interactive computational environment for creating notebook documents.
+SKILL-053,Dashboarding,Data Analysis & BI,kpi-dashboards,Creation of visual dashboards displaying key performance indicators.
+SKILL-054,Reporting,Data Analysis & BI,business-reporting,Structured compilation and communication of business metrics.
+SKILL-055,Business Intelligence,Data Analysis & BI,bi,Strategies and technologies used by enterprises for data analysis of business information.
+SKILL-056,Google Sheets,Data Analysis & BI,gsheets,Cloud-based spreadsheet program for collaboration and quick analysis.
+SKILL-057,Linux,Cloud & DevOps,"unix, debian, ubuntu",Open source Unix-like operating system kernel dominant in servers and cloud.
+SKILL-058,Docker,Cloud & DevOps,"containers, containerization","Platform for building, running, and shipping applications using lightweight containers."
+SKILL-059,Kubernetes,Cloud & DevOps,k8s,"Open source system for automating deployment, scaling, and management of containerized apps."
+SKILL-060,AWS,Cloud & DevOps,amazon-web-services,Comprehensive cloud computing platform provided by Amazon.
+SKILL-061,CI/CD,Cloud & DevOps,"continuous-integration, continuous-deployment",Automated practice of integrating code changes and delivering software to production.
+SKILL-062,GitHub Actions,Cloud & DevOps,gh-actions,Continuous integration and continuous delivery platform built into GitHub.
+SKILL-063,Terraform,Cloud & DevOps,"iac, infrastructure-as-code",Infrastructure as code software tool created by HashiCorp.
+SKILL-064,Nginx,Cloud & DevOps,"web-server, reverse-proxy","High-performance web server, reverse proxy, and load balancer."
+SKILL-065,Prometheus,Cloud & DevOps,metrics-monitoring,Open source monitoring system with a dimensional data model and flexible query language.
+SKILL-066,Grafana,Cloud & DevOps,observability-dashboards,Multi-platform open source analytics and interactive visualization web application.
+SKILL-067,Azure,Cloud & DevOps,ms-azure,Cloud computing platform and infrastructure created by Microsoft.
+SKILL-068,GCP,Cloud & DevOps,google-cloud,Suite of cloud computing services that runs on the same infrastructure Google uses internally.
+SKILL-069,Network Security,Cybersecurity,"netsec, perimeter-defense",Provisions and policies adopted to prevent and monitor unauthorized access to networks.
+SKILL-070,SIEM,Cybersecurity,security-information-event-management,Security information and event management combining SIM and SEM.
+SKILL-071,Wireshark,Cybersecurity,"packet-sniffer, pcap",Open source packet analyzer used for network troubleshooting and analysis.
+SKILL-072,Penetration Testing,Cybersecurity,"pentest, ethical-hacking",Authorized simulated cyberattack on a computer system to evaluate its security.
+SKILL-073,Incident Response,Cybersecurity,"ir, threat-triage",Structured methodology for handling and managing the aftermath of a security breach.
+SKILL-074,Splunk,Cybersecurity,log-analytics,"Software platform to search, monitor, and analyze machine-generated data via a web-style interface."
+SKILL-075,Nmap,Cybersecurity,network-scanner,Network scanner used to discover hosts and services on a computer network.
+SKILL-076,Burp Suite,Cybersecurity,web-vulnerability-scanner,Integrated platform for performing security testing of web applications.
+SKILL-077,Firewalls,Cybersecurity,"packet-filtering, ngfw",Network security devices that monitor and control incoming and outgoing network traffic.
+SKILL-078,Vulnerability Assessment,Cybersecurity,"vuln-scanning, cve","Process of identifying, quantifying, and prioritizing vulnerabilities in a system."
+SKILL-079,Threat Analysis,Cybersecurity,threat-intelligence,Analysis of potential security threats against an organization's assets.
+SKILL-080,Git,Core Engineering & Collaboration,"vcs, version-control",Distributed version control system for tracking changes in source code.
+SKILL-081,GitHub,Core Engineering & Collaboration,"gh, code-hosting",Web-based hosting service for version control using Git.
+SKILL-082,Agile,Core Engineering & Collaboration,"scrum, kanban",Iterative approach to project management and software development.
+SKILL-083,Problem Solving,Core Engineering & Collaboration,analytical-thinking,"Ability to define problems, determine root cause, and implement effective solutions."
+SKILL-084,Communication,Core Engineering & Collaboration,verbal-written,Clear conveyance of technical concepts to both technical and non-technical stakeholders.
+SKILL-085,Teamwork,Core Engineering & Collaboration,cross-functional,Collaborative effort of a team to achieve a common goal effectively.
+SKILL-086,Project Management,Core Engineering & Collaboration,planning-execution,"Discipline of initiating, planning, executing, and closing work to meet specific criteria."
+SKILL-087,Research,Core Engineering & Collaboration,literature-investigation,Systematic investigation into materials and sources in order to establish facts and reach new conclusions.
