@@ -1,4 +1,4 @@
-career,rank,term,coefficient
+career,rank,feature,coefficient
 Backend Developer,1,postgresql,1.7557494271566845
 Backend Developer,2,fastapi,1.54148578038324
 Backend Developer,3,api,1.337604087125614

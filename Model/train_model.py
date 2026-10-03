@@ -1,7 +1,10 @@
-"""Train an offline ResumeXpert career-classification demonstration model.
+"""Train the offline ResumeXpert career-classification demonstration model.
 
-IMPORTANT: This script creates and trains on a synthetic dataset for demonstration.
-The resulting model is NOT integrated into the deployed ResumeXpert application.
+IMPORTANT:
+- This script trains strictly on dataset/synthetic_resume_career_dataset.csv.
+- It NEVER touches or trains on the independent challenge dataset.
+- The test set is evaluated independently and never used to fit the pipeline.
+- All evaluation artifacts, metric tables, and diagnostic plots are saved to artifacts/.
 """
 from __future__ import annotations
 
@@ -10,6 +13,7 @@ import random
 from pathlib import Path
 
 import matplotlib.pyplot as plt
+import numpy as np
 import pandas as pd
 from joblib import dump
 from sklearn.feature_extraction.text import TfidfVectorizer
@@ -22,7 +26,7 @@ from sklearn.metrics import (
     precision_score,
     recall_score,
 )
-from sklearn.model_selection import train_test_split
+from sklearn.model_selection import learning_curve, train_test_split
 from sklearn.pipeline import Pipeline
 from sklearn.utils import Bunch
 
@@ -138,8 +142,6 @@ def generate_dataset() -> pd.DataFrame:
             skills = _sample_without_replacement(profile["core"], core_count)
             skills += _sample_without_replacement(profile["support"], support_count)
 
-            # Add cross-career noise so the classifier learns patterns from
-            # skills/projects rather than a perfectly clean class boundary.
             if RANDOM.random() < 0.80:
                 skills.append(RANDOM.choice(NOISE_SKILLS))
             if RANDOM.random() < 0.35:
@@ -175,10 +177,21 @@ def generate_dataset() -> pd.DataFrame:
 
 
 def train() -> Bunch:
-    # 1. Dataset Generation & Persistence
-    df = generate_dataset()
-    DATASET_PATH.parent.mkdir(parents=True, exist_ok=True)
-    df.to_csv(DATASET_PATH, index=False)
+    print("==================================================")
+    print("RESUMEXPERT MODEL TRAINING & EVALUATION")
+    print("==================================================")
+
+    # 1. Dataset Loading / Generation
+    if not DATASET_PATH.exists():
+        print(f"Generating synthetic dataset at {DATASET_PATH}...")
+        df = generate_dataset()
+        DATASET_PATH.parent.mkdir(parents=True, exist_ok=True)
+        df.to_csv(DATASET_PATH, index=False)
+    else:
+        print(f"Loading dataset from {DATASET_PATH}...")
+        df = pd.read_csv(DATASET_PATH)
+
+    print(f"Dataset successfully loaded: {len(df):,} total samples across {df['career'].nunique()} classes.")
 
     # 2. Stratified Train / Test Split
     X_train, X_test, y_train, y_test = train_test_split(
@@ -188,6 +201,8 @@ def train() -> Bunch:
         random_state=SEED,
         stratify=df["career"],
     )
+
+    print(f"Split completed: Train={len(X_train)} samples (80%), Test={len(X_test)} samples (20%).")
 
     # 3. Model Pipeline Construction
     pipeline = Pipeline([
@@ -211,15 +226,16 @@ def train() -> Bunch:
         ),
     ])
 
-    # 4. Pipeline Fitting
+    # 4. Pipeline Fitting (Strictly on X_train)
+    print("Fitting TF-IDF Vectorizer and Logistic Regression classifier on training data...")
     pipeline.fit(X_train, y_train)
 
-    # 5. Prediction & Probability Estimation
+    # 5. Prediction & Evaluation on Held-Out Test Split
+    print("Evaluating model on held-out test split (320 samples)...")
     predictions = pipeline.predict(X_test)
     probabilities = pipeline.predict_proba(X_test)
 
-    # 6. Evaluation Metrics Computation
-    labels = list(pipeline.classes_)
+    labels = sorted(list(pipeline.classes_))
     accuracy = float(accuracy_score(y_test, predictions))
     macro_precision = float(precision_score(y_test, predictions, average="macro", zero_division=0))
     macro_recall = float(recall_score(y_test, predictions, average="macro", zero_division=0))
@@ -228,19 +244,21 @@ def train() -> Bunch:
     weighted_recall = float(recall_score(y_test, predictions, average="weighted", zero_division=0))
     weighted_f1 = float(f1_score(y_test, predictions, average="weighted", zero_division=0))
 
-    report_text = classification_report(y_test, predictions, digits=4)
     report_dict = classification_report(y_test, predictions, output_dict=True, digits=4)
     cm = confusion_matrix(y_test, predictions, labels=labels)
 
-    # 7. Model Serialization
-    dump(pipeline, ARTIFACTS / "career_classifier.joblib")
+    # 6. Model Serialization
+    model_file = ARTIFACTS / "career_classifier.joblib"
+    dump(pipeline, model_file)
+    print(f"Trained model serialized to: {model_file}")
 
-    # 8. Save Metrics & Reports
+    # 7. Save Metrics & CSV Report
     vectorizer: TfidfVectorizer = pipeline.named_steps["tfidf"]
     classifier: LogisticRegression = pipeline.named_steps["classifier"]
     vocab_size = len(vectorizer.vocabulary_)
 
     metrics = {
+        "model_algorithm": "TF-IDF Vectorizer + Multinomial Logistic Regression",
         "task": "resume_text_to_career_classification",
         "dataset": DATASET_PATH.name,
         "dataset_type": "synthetic",
@@ -251,36 +269,34 @@ def train() -> Bunch:
         "test_split_ratio": 0.20,
         "num_classes": int(len(labels)),
         "classes": labels,
-        "model": "TF-IDF + Logistic Regression",
         "tfidf_ngram_range": [1, 2],
         "tfidf_vocabulary_size": vocab_size,
-        "accuracy": round(accuracy, 6),
-        "macro_precision": round(macro_precision, 6),
-        "macro_recall": round(macro_recall, 6),
-        "macro_f1": round(macro_f1, 6),
-        "weighted_precision": round(weighted_precision, 6),
-        "weighted_recall": round(weighted_recall, 6),
-        "weighted_f1": round(weighted_f1, 6),
+        "standard_test_accuracy": round(accuracy, 6),
+        "standard_test_macro_precision": round(macro_precision, 6),
+        "standard_test_macro_recall": round(macro_recall, 6),
+        "standard_test_macro_f1": round(macro_f1, 6),
+        "standard_test_weighted_precision": round(weighted_precision, 6),
+        "standard_test_weighted_recall": round(weighted_recall, 6),
+        "standard_test_weighted_f1": round(weighted_f1, 6),
     }
     (ARTIFACTS / "metrics.json").write_text(json.dumps(metrics, indent=2), encoding="utf-8")
-    (ARTIFACTS / "classification_report.txt").write_text(report_text, encoding="utf-8")
 
     # Save classification report as CSV
     report_df = pd.DataFrame(report_dict).transpose().reset_index()
-    report_df.rename(columns={"index": "class_or_metric"}, inplace=True)
+    report_df.rename(columns={"index": "career_or_metric"}, inplace=True)
     report_df.to_csv(ARTIFACTS / "classification_report.csv", index=False)
 
     # Save confusion matrix CSV
     cm_df = pd.DataFrame(cm, index=labels, columns=labels)
     cm_df.to_csv(ARTIFACTS / "confusion_matrix.csv")
 
-    # 9. Confusion Matrix Visualization Plot
-    fig, ax = plt.subplots(figsize=(10, 8))
+    # 8. Plot 1: Confusion Matrix Visualization Heatmap
+    fig, ax = plt.subplots(figsize=(9, 7.5))
     im = ax.imshow(cm, interpolation="nearest", cmap="Blues")
-    ax.set_title("ResumeXpert Career Classifier — Confusion Matrix", fontsize=14, fontweight="bold", pad=15)
+    ax.set_title("ResumeXpert Career Classifier — Confusion Matrix", fontsize=13, fontweight="bold", pad=12)
     fig.colorbar(im, ax=ax, fraction=0.046, pad=0.04)
     ax.set_xlabel("Predicted Career Class", fontsize=11, fontweight="bold", labelpad=10)
-    ax.set_ylabel("True Career Class", fontsize=11, fontweight="bold", labelpad=10)
+    ax.set_ylabel("Actual Career Class", fontsize=11, fontweight="bold", labelpad=10)
     ax.set_xticks(range(len(labels)))
     ax.set_yticks(range(len(labels)))
     ax.set_xticklabels(labels, rotation=45, ha="right", fontsize=9)
@@ -294,14 +310,14 @@ def train() -> Bunch:
     fig.savefig(ARTIFACTS / "confusion_matrix.png", dpi=180)
     plt.close(fig)
 
-    # 10. Class Distribution Visualization Plot
+    # 9. Plot 2: Class Distribution Visualization Plot
     class_counts = df["career"].value_counts()[labels]
-    fig2, ax2 = plt.subplots(figsize=(10, 6))
+    fig2, ax2 = plt.subplots(figsize=(9.5, 5.5))
     bars = ax2.barh(labels, class_counts.values, color="#2563EB", edgecolor="#1D4ED8", height=0.6)
-    ax2.set_title("Resume Career Dataset — Class Distribution (Samples per Career)", fontsize=13, fontweight="bold", pad=15)
-    ax2.set_xlabel("Number of Samples", fontsize=11, fontweight="bold", labelpad=10)
+    ax2.set_title("Resume Career Dataset — Class Distribution (Samples per Career)", fontsize=13, fontweight="bold", pad=12)
+    ax2.set_xlabel("Number of Samples", fontsize=11, fontweight="bold", labelpad=8)
     ax2.set_ylabel("Career Class", fontsize=11, fontweight="bold")
-    ax2.set_xlim(0, max(class_counts.values) * 1.15)
+    ax2.set_xlim(0, max(class_counts.values) * 1.18)
     for bar in bars:
         width = bar.get_width()
         ax2.text(width + 3, bar.get_y() + bar.get_height() / 2, f"{int(width)} ({width/len(df):.1%})",
@@ -311,9 +327,37 @@ def train() -> Bunch:
     fig2.savefig(ARTIFACTS / "class_distribution.png", dpi=180)
     plt.close(fig2)
 
-    # 11. Top Features / Terms per Career Class
+    # 10. Plot 3: Per-Class Metric Graph (Precision, Recall, F1 for every career)
+    class_metrics = [report_dict[c] for c in labels]
+    precisions = [m["precision"] for m in class_metrics]
+    recalls = [m["recall"] for m in class_metrics]
+    f1s = [m["f1-score"] for m in class_metrics]
+
+    x = np.arange(len(labels))
+    width = 0.25
+
+    fig3, ax3 = plt.subplots(figsize=(11, 6))
+    ax3.bar(x - width, precisions, width, label="Precision", color="#3B82F6")
+    ax3.bar(x, recalls, width, label="Recall", color="#10B981")
+    ax3.bar(x + width, f1s, width, label="F1-Score", color="#F59E0B")
+    ax3.set_title("Per-Class Performance Metrics (Test Set)", fontsize=13, fontweight="bold", pad=12)
+    ax3.set_ylabel("Score (0.0 to 1.0)", fontsize=11, fontweight="bold")
+    ax3.set_xticks(x)
+    ax3.set_xticklabels(labels, rotation=35, ha="right", fontsize=9)
+    ax3.set_ylim(0, 1.15)
+    ax3.legend(loc="upper right", framealpha=0.9)
+    ax3.grid(axis="y", linestyle="--", alpha=0.4)
+    fig3.tight_layout()
+    fig3.savefig(ARTIFACTS / "per_class_metrics.png", dpi=180)
+    plt.close(fig3)
+
+    # 11. Plot 4 & CSV: Top Features by Class
     feature_names = vectorizer.get_feature_names_out()
     records = []
+    top_n_features = 8
+    fig4, axes = plt.subplots(4, 2, figsize=(14, 16))
+    axes = axes.flatten()
+
     for class_index, career in enumerate(classifier.classes_):
         weights = classifier.coef_[class_index]
         top_indices = weights.argsort()[-15:][::-1]
@@ -321,24 +365,68 @@ def train() -> Bunch:
             records.append({
                 "career": career,
                 "rank": rank,
-                "term": feature_names[feature_index],
+                "feature": feature_names[feature_index],
                 "coefficient": float(weights[feature_index]),
             })
-    top_terms_df = pd.DataFrame(records)
-    top_terms_df.to_csv(ARTIFACTS / "top_terms_by_career.csv", index=False)
+
+        # Plot top 8 for this class in subplot
+        top_plot_idx = weights.argsort()[-top_n_features:]
+        top_plot_terms = [feature_names[i] for i in top_plot_idx]
+        top_plot_weights = [weights[i] for i in top_plot_idx]
+
+        ax = axes[class_index]
+        ax.barh(top_plot_terms, top_plot_weights, color="#4F46E5", edgecolor="#3730A3", height=0.6)
+        ax.set_title(career, fontsize=11, fontweight="bold")
+        ax.set_xlabel("Coefficient Weight", fontsize=9)
+        ax.grid(axis="x", linestyle="--", alpha=0.5)
+
+    fig4.suptitle("Top Discriminative TF-IDF Features by Career Class", fontsize=15, fontweight="bold", y=0.995)
+    fig4.tight_layout()
+    fig4.savefig(ARTIFACTS / "top_features_by_class.png", dpi=180)
+    plt.close(fig4)
+
+    pd.DataFrame(records).to_csv(ARTIFACTS / "top_features_by_class.csv", index=False)
+
+    # 12. Plot 5: Scikit-Learn Learning Curve
+    print("Computing cross-validated learning curve...")
+    train_sizes, train_scores, test_scores = learning_curve(
+        pipeline,
+        X_train,
+        y_train,
+        cv=5,
+        scoring="accuracy",
+        train_sizes=np.linspace(0.2, 1.0, 5),
+        random_state=SEED,
+        n_jobs=1,
+    )
+
+    train_mean = np.mean(train_scores, axis=1)
+    train_std = np.std(train_scores, axis=1)
+    test_mean = np.mean(test_scores, axis=1)
+    test_std = np.std(test_scores, axis=1)
+
+    fig5, ax5 = plt.subplots(figsize=(8.5, 5.5))
+    ax5.plot(train_sizes, train_mean, "o-", color="#DC2626", label="Training Score", linewidth=2)
+    ax5.fill_between(train_sizes, train_mean - train_std, train_mean + train_std, alpha=0.15, color="#DC2626")
+    ax5.plot(train_sizes, test_mean, "s-", color="#2563EB", label="Cross-Validation Score", linewidth=2)
+    ax5.fill_between(train_sizes, test_mean - test_std, test_mean + test_std, alpha=0.15, color="#2563EB")
+    ax5.set_title("Model Learning Curve (TF-IDF + Logistic Regression)", fontsize=13, fontweight="bold", pad=12)
+    ax5.set_xlabel("Training Set Size (Samples)", fontsize=11, fontweight="bold", labelpad=8)
+    ax5.set_ylabel("Accuracy Score", fontsize=11, fontweight="bold", labelpad=8)
+    ax5.set_ylim(0.7, 1.05)
+    ax5.legend(loc="lower right", framealpha=0.9)
+    ax5.grid(True, linestyle="--", alpha=0.4)
+    fig5.tight_layout()
+    fig5.savefig(ARTIFACTS / "learning_curve.png", dpi=180)
+    plt.close(fig5)
 
     print("==================================================")
-    print("RESUMEXPERT MODEL TRAINING COMPLETE")
-    print("==================================================")
-    print(f"Dataset: {DATASET_PATH}")
-    print(f"Total Samples: {len(df)}")
-    print(f"Train Samples: {len(X_train)} | Test Samples: {len(X_test)}")
-    print(f"Classes ({len(labels)}): {', '.join(labels)}")
-    print(f"TF-IDF Vocabulary: {vocab_size} features")
-    print(f"Accuracy: {accuracy:.4f} ({accuracy*100:.2f}%)")
+    print("TRAINING & INITIAL EVALUATION COMPLETE")
+    print(f"Standard Test Accuracy: {accuracy:.4f} ({accuracy*100:.2f}%)")
     print(f"Macro F1: {macro_f1:.4f} | Weighted F1: {weighted_f1:.4f}")
-    print(f"Artifacts directory: {ARTIFACTS}")
+    print(f"Generated artifacts saved to {ARTIFACTS}")
     print("==================================================")
+
     return Bunch(model=pipeline, metrics=metrics, probabilities=probabilities)
 
 

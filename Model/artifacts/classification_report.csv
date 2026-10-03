@@ -1,4 +1,4 @@
-class_or_metric,precision,recall,f1-score,support
+career_or_metric,precision,recall,f1-score,support
 Backend Developer,1.0,1.0,1.0,40.0
 Cybersecurity Analyst,1.0,1.0,1.0,40.0
 Data Analyst,1.0,1.0,1.0,40.0

@@ -1,4 +1,5 @@
 {
+  "model_algorithm": "TF-IDF Vectorizer + Multinomial Logistic Regression",
   "task": "resume_text_to_career_classification",
   "dataset": "synthetic_resume_career_dataset.csv",
   "dataset_type": "synthetic",
@@ -18,17 +19,20 @@
     "Full Stack Developer",
     "Machine Learning Engineer"
   ],
-  "model": "TF-IDF + Logistic Regression",
   "tfidf_ngram_range": [
     1,
     2
   ],
   "tfidf_vocabulary_size": 1594,
-  "accuracy": 1.0,
-  "macro_precision": 1.0,
-  "macro_recall": 1.0,
-  "macro_f1": 1.0,
-  "weighted_precision": 1.0,
-  "weighted_recall": 1.0,
-  "weighted_f1": 1.0
+  "standard_test_accuracy": 1.0,
+  "standard_test_macro_precision": 1.0,
+  "standard_test_macro_recall": 1.0,
+  "standard_test_macro_f1": 1.0,
+  "standard_test_weighted_precision": 1.0,
+  "standard_test_weighted_recall": 1.0,
+  "standard_test_weighted_f1": 1.0,
+  "challenge_dataset": "challenge_resume_dataset.csv",
+  "challenge_samples": 48,
+  "challenge_correct": 45,
+  "challenge_accuracy": 0.9375
 }

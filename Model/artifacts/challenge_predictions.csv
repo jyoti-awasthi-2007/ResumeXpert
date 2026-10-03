@@ -1,0 +1,49 @@
+sample_id,expected_career,predicted_career,correct,top_probability
+CHAL-DS-01,Data Scientist,Data Scientist,True,0.7352
+CHAL-DS-02,Data Scientist,Data Scientist,True,0.4634
+CHAL-DS-03,Data Scientist,Data Scientist,True,0.5217
+CHAL-DS-04,Data Scientist,Data Scientist,True,0.497
+CHAL-DS-05,Data Scientist,Data Scientist,True,0.6848
+CHAL-DS-06,Data Scientist,Data Scientist,True,0.6863
+CHAL-MLE-01,Machine Learning Engineer,Machine Learning Engineer,True,0.9069
+CHAL-MLE-02,Machine Learning Engineer,DevOps Engineer,False,0.3696
+CHAL-MLE-03,Machine Learning Engineer,Machine Learning Engineer,True,0.5471
+CHAL-MLE-04,Machine Learning Engineer,Machine Learning Engineer,True,0.566
+CHAL-MLE-05,Machine Learning Engineer,Machine Learning Engineer,True,0.2725
+CHAL-MLE-06,Machine Learning Engineer,Machine Learning Engineer,True,0.8042
+CHAL-DA-01,Data Analyst,Data Analyst,True,0.8422
+CHAL-DA-02,Data Analyst,Data Analyst,True,0.7639
+CHAL-DA-03,Data Analyst,Data Analyst,True,0.9241
+CHAL-DA-04,Data Analyst,Data Analyst,True,0.7387
+CHAL-DA-05,Data Analyst,Data Analyst,True,0.7753
+CHAL-DA-06,Data Analyst,Data Analyst,True,0.8118
+CHAL-FSD-01,Full Stack Developer,Full Stack Developer,True,0.7041
+CHAL-FSD-02,Full Stack Developer,Full Stack Developer,True,0.4904
+CHAL-FSD-03,Full Stack Developer,Full Stack Developer,True,0.5882
+CHAL-FSD-04,Full Stack Developer,Backend Developer,False,0.3049
+CHAL-FSD-05,Full Stack Developer,Full Stack Developer,True,0.435
+CHAL-FSD-06,Full Stack Developer,Full Stack Developer,True,0.8616
+CHAL-FED-01,Frontend Developer,Frontend Developer,True,0.8525
+CHAL-FED-02,Frontend Developer,Frontend Developer,True,0.7302
+CHAL-FED-03,Frontend Developer,Frontend Developer,True,0.8665
+CHAL-FED-04,Frontend Developer,Full Stack Developer,False,0.4238
+CHAL-FED-05,Frontend Developer,Frontend Developer,True,0.8371
+CHAL-FED-06,Frontend Developer,Frontend Developer,True,0.5968
+CHAL-BED-01,Backend Developer,Backend Developer,True,0.9258
+CHAL-BED-02,Backend Developer,Backend Developer,True,0.8408
+CHAL-BED-03,Backend Developer,Backend Developer,True,0.6656
+CHAL-BED-04,Backend Developer,Backend Developer,True,0.7541
+CHAL-BED-05,Backend Developer,Backend Developer,True,0.8936
+CHAL-BED-06,Backend Developer,Backend Developer,True,0.7949
+CHAL-DOE-01,DevOps Engineer,DevOps Engineer,True,0.9642
+CHAL-DOE-02,DevOps Engineer,DevOps Engineer,True,0.9437
+CHAL-DOE-03,DevOps Engineer,DevOps Engineer,True,0.8446
+CHAL-DOE-04,DevOps Engineer,DevOps Engineer,True,0.9211
+CHAL-DOE-05,DevOps Engineer,DevOps Engineer,True,0.8723
+CHAL-DOE-06,DevOps Engineer,DevOps Engineer,True,0.851
+CHAL-CSA-01,Cybersecurity Analyst,Cybersecurity Analyst,True,0.9677
+CHAL-CSA-02,Cybersecurity Analyst,Cybersecurity Analyst,True,0.7741
+CHAL-CSA-03,Cybersecurity Analyst,Cybersecurity Analyst,True,0.9581
+CHAL-CSA-04,Cybersecurity Analyst,Cybersecurity Analyst,True,0.8207
+CHAL-CSA-05,Cybersecurity Analyst,Cybersecurity Analyst,True,0.8327
+CHAL-CSA-06,Cybersecurity Analyst,Cybersecurity Analyst,True,0.9403

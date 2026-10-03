@@ -1,4 +1,4 @@
-"""Single-command comprehensive report summarizing the model, datasets, training, and artifacts.
+"""Single-command comprehensive report summarizing the trained model, datasets, evaluation, and artifacts.
 
 All metrics, parameters, and counts are read dynamically from actual files in Model/.
 """
@@ -14,11 +14,11 @@ DATASET_DIR = ROOT / "dataset"
 ARTIFACTS_DIR = ROOT / "artifacts"
 
 RESUME_CSV = DATASET_DIR / "synthetic_resume_career_dataset.csv"
+CHALLENGE_CSV = DATASET_DIR / "challenge_resume_dataset.csv"
 SKILLS_CSV = DATASET_DIR / "skills_dataset.csv"
 ASSESS_CSV = DATASET_DIR / "assessment_questions.csv"
 MODEL_FILE = ARTIFACTS_DIR / "career_classifier.joblib"
 METRICS_FILE = ARTIFACTS_DIR / "metrics.json"
-CM_FILE = ARTIFACTS_DIR / "confusion_matrix.png"
 
 
 def generate_report() -> None:
@@ -27,7 +27,6 @@ def generate_report() -> None:
     print("=" * 60)
 
     # 1. Model Info
-    model_obj = load(MODEL_FILE) if MODEL_FILE.exists() else None
     metrics_data = {}
     if METRICS_FILE.exists():
         try:
@@ -37,103 +36,108 @@ def generate_report() -> None:
 
     print("\nMODEL")
     print("  Algorithm    : TF-IDF Vectorizer + Multinomial Logistic Regression")
-    print("  Task         : Resume Text to Career Category Prediction")
-    print("  Problem Type : Supervised Multiclass Classification")
-    print("  Library      : scikit-learn (Python)")
+    print("  Problem      : Supervised Multiclass Text Classification")
+    print(f"  Total Samples: {metrics_data.get('total_samples', 1600):,}")
+    print(f"  Total Classes: {metrics_data.get('num_classes', 8)}")
 
-    # 2. Dataset Info
-    resume_df = pd.read_csv(RESUME_CSV) if RESUME_CSV.exists() else None
-    if resume_df is not None:
-        total_samples = len(resume_df)
-        cols = list(resume_df.columns)
-        classes = sorted(resume_df["career"].unique())
-        num_classes = len(classes)
-    else:
-        total_samples = metrics_data.get("total_samples", 0)
-        cols = ["id", "resume_text", "career"]
-        classes = metrics_data.get("classes", [])
-        num_classes = len(classes)
-
-    print("\nDATASET")
-    print(f"  Source File   : {RESUME_CSV.name}")
-    print(f"  Dataset Type  : Synthetic / Demonstration Dataset (Fixed Seed 42)")
-    print(f"  Total Samples : {total_samples:,}")
-    print(f"  Features      : Raw text ({cols[1]})")
-    print(f"  Target Label  : Career ({cols[2]})")
-    print(f"  Total Classes : {num_classes}")
+    # 2. Classes
+    classes = metrics_data.get("classes", [])
+    if not classes and RESUME_CSV.exists():
+        df = pd.read_csv(RESUME_CSV)
+        classes = sorted(df["career"].unique())
 
     print("\nCLASSES")
     for idx, c in enumerate(classes, start=1):
-        count_str = ""
-        if resume_df is not None:
-            count = (resume_df["career"] == c).sum()
-            count_str = f" ({count} samples, {count/total_samples:.1%})"
-        print(f"  {idx}. {c}{count_str}")
+        print(f"  {idx}. {c}")
 
-    # 3. Training Split
-    train_samples = metrics_data.get("train_samples", int(total_samples * 0.8))
-    test_samples = metrics_data.get("test_samples", int(total_samples * 0.2))
+    # 3. Training
+    train_samples = metrics_data.get("train_samples", 1280)
+    test_samples = metrics_data.get("test_samples", 320)
     seed = metrics_data.get("random_seed", 42)
     split_ratio = metrics_data.get("test_split_ratio", 0.20)
 
     print("\nTRAINING")
-    print(f"  Train Samples : {train_samples:,} ({1.0 - split_ratio:.0%})")
-    print(f"  Test Samples  : {test_samples:,} ({split_ratio:.0%})")
-    print(f"  Test Split    : {split_ratio:.0%} (Stratified)")
-    print(f"  Random Seed   : {seed}")
+    print(f"  Train Samples: {train_samples:,} (80%)")
+    print(f"  Test Samples : {test_samples:,} (20%)")
+    print(f"  Split        : Stratified 80/20")
+    print(f"  Random Seed  : {seed}")
 
-    # 4. Model Features
-    vocab_size = metrics_data.get("tfidf_vocabulary_size", "N/A")
+    # 4. Features
+    vocab_size = metrics_data.get("tfidf_vocabulary_size", "1,594")
     ngrams = metrics_data.get("tfidf_ngram_range", [1, 2])
-    print("\nMODEL FEATURES")
-    print(f"  TF-IDF Features: {vocab_size:,} unigrams & bigrams" if isinstance(vocab_size, int) else f"  TF-IDF Features: {vocab_size}")
-    print(f"  N-Grams        : {tuple(ngrams)}")
-    print("  Sublinear TF   : True (logarithmic scaling)")
-    print("  Document Freq  : min_df=2, max_df=0.95")
+    print("\nFEATURES")
+    print(f"  TF-IDF Vocabulary: {vocab_size:,} features" if isinstance(vocab_size, int) else f"  TF-IDF Vocabulary: {vocab_size}")
+    print(f"  N-Gram Range     : {tuple(ngrams)} (Unigrams + Bigrams)")
 
-    # 5. Evaluation
-    acc = metrics_data.get("accuracy", 1.0)
-    m_prec = metrics_data.get("macro_precision", 1.0)
-    m_rec = metrics_data.get("macro_recall", 1.0)
-    m_f1 = metrics_data.get("macro_f1", 1.0)
-    w_f1 = metrics_data.get("weighted_f1", 1.0)
+    # 5. Standard Test Evaluation
+    std_acc = metrics_data.get("standard_test_accuracy", 1.0)
+    m_prec = metrics_data.get("standard_test_macro_precision", 1.0)
+    m_rec = metrics_data.get("standard_test_macro_recall", 1.0)
+    m_f1 = metrics_data.get("standard_test_macro_f1", 1.0)
+    w_f1 = metrics_data.get("standard_test_weighted_f1", 1.0)
 
-    print("\nEVALUATION (ON TEST SET)")
-    print(f"  Accuracy       : {acc:.4f} ({acc*100:.2f}%)")
-    print(f"  Macro Precision: {m_prec:.4f}")
-    print(f"  Macro Recall   : {m_rec:.4f}")
-    print(f"  Macro F1       : {m_f1:.4f}")
-    print(f"  Weighted F1    : {w_f1:.4f}")
-    print("  * Note: Measured on controlled synthetic test data; not representative of messy real-world resumes.")
+    print("\nSTANDARD TEST (HELD-OUT SYNTHETIC)")
+    print(f"  Accuracy   : {std_acc:.4f} ({std_acc*100:.2f}%)")
+    print(f"  Precision  : {m_prec:.4f}")
+    print(f"  Recall     : {m_rec:.4f}")
+    print(f"  F1         : {m_f1:.4f}")
+    print(f"  Macro F1   : {m_f1:.4f}")
+    print(f"  Weighted F1: {w_f1:.4f}")
 
-    # 6. Skills Dataset
+    # 6. Challenge Test Evaluation
+    chal_samples = metrics_data.get("challenge_samples", 0)
+    chal_acc = metrics_data.get("challenge_accuracy", None)
+    chal_corr = metrics_data.get("challenge_correct", 0)
+
+    print("\nCHALLENGE TEST (INDEPENDENT REALISTIC DATASET)")
+    print(f"  Challenge Samples : {chal_samples}")
+    if chal_acc is not None:
+        print(f"  Challenge Accuracy: {chal_acc:.4f} ({chal_corr}/{chal_samples} correct, {chal_acc*100:.2f}%)")
+    else:
+        print("  Challenge Accuracy: Run python evaluate_model.py to compute")
+
+    # 7. Skills Dataset
     if SKILLS_CSV.exists():
         skills_df = pd.read_csv(SKILLS_CSV)
         total_skills = len(skills_df)
         categories = sorted(skills_df["category"].unique())
         print("\nSKILLS DATASET")
-        print(f"  Total Skills   : {total_skills}")
-        print(f"  Categories ({len(categories)}): {', '.join(categories)}")
-    else:
-        print("\nSKILLS DATASET: Not found.")
+        print(f"  Total Skills: {total_skills}")
+        print(f"  Categories  : {len(categories)} ({', '.join(categories)})")
 
-    # 7. Assessment Dataset
+    # 8. Assessment Dataset
     if ASSESS_CSV.exists():
         assess_df = pd.read_csv(ASSESS_CSV)
         total_q = len(assess_df)
-        diffs = assess_df["difficulty"].value_counts().to_dict()
-        diff_str = ", ".join([f"{k}: {v}" for k, v in diffs.items()])
+        diff_counts = assess_df["difficulty"].value_counts().to_dict()
         print("\nASSESSMENT DATASET")
-        print(f"  Total Questions  : {total_q}")
-        print(f"  Difficulty Levels: {diff_str}")
-    else:
-        print("\nASSESSMENT DATASET: Not found.")
+        print(f"  Total Questions: {total_q}")
+        print(f"  Beginner       : {diff_counts.get('BEGINNER', 0)}")
+        print(f"  Advanced       : {diff_counts.get('ADVANCED', 0)}")
+        print(f"  Expert         : {diff_counts.get('EXPERT', 0)}")
 
-    # 8. Artifacts
-    print("\nARTIFACTS")
-    print(f"  Model File       : {MODEL_FILE.name} ({MODEL_FILE.stat().st_size:,} bytes)" if MODEL_FILE.exists() else "  Model File: Missing")
-    print(f"  Metrics File     : {METRICS_FILE.name}" if METRICS_FILE.exists() else "  Metrics File: Missing")
-    print(f"  Confusion Matrix : {CM_FILE.name}" if CM_FILE.exists() else "  Confusion Matrix: Missing")
+    # 9. Artifacts Verification
+    print("\nGENERATED ARTIFACTS")
+    artifacts = [
+        "career_classifier.joblib",
+        "metrics.json",
+        "classification_report.csv",
+        "confusion_matrix.csv",
+        "confusion_matrix.png",
+        "class_distribution.png",
+        "per_class_metrics.png",
+        "top_features_by_class.csv",
+        "top_features_by_class.png",
+        "learning_curve.png",
+        "challenge_predictions.csv",
+        "challenge_accuracy.png",
+        "prediction_probabilities.png",
+        "sample_predictions.csv",
+    ]
+    for art in artifacts:
+        fpath = ARTIFACTS_DIR / art
+        status = "EXISTS" if fpath.exists() else "MISSING"
+        print(f"  - {art:<30}: [{status}]")
 
     print("\n" + "=" * 60)
     print("END OF RESUMEXPERT MODEL REPORT")
